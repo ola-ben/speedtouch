@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom'
+
 function Logo({ wordmark = true, className = '' }) {
   return (
-    <a href="#top" className={`inline-flex items-center gap-2.5 ${className}`}>
+    <Link to="/" className={`inline-flex items-center gap-2.5 ${className}`}>
       <svg
         viewBox="0 0 40 40"
         xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +28,7 @@ function Logo({ wordmark = true, className = '' }) {
           Speed<span className="text-brand-blue">touch</span>
         </span>
       )}
-    </a>
+    </Link>
   )
 }
 

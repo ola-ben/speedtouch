@@ -1,32 +1,33 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Logo from './Logo'
+
+const links = [
+  { label: 'Home', to: '/' },
+  { label: 'Services', to: '/#services' },
+  { label: 'Products', to: '/products' },
+  { label: 'Pricing', to: '/#pricing' },
+  { label: 'Contact', to: '/#contact' },
+]
 
 function Header() {
   const [open, setOpen] = useState(false)
-
-  const links = [
-    { label: 'Home', href: '#top' },
-    { label: 'Services', href: '#services' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Contact', href: '#contact' },
-  ]
-
   const closeOnClick = () => setOpen(false)
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Logo />
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
-            <a
+            <Link
               key={l.label}
-              href={l.href}
+              to={l.to}
               className="text-sm font-medium text-slate-600 transition hover:text-brand-blue"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -37,17 +38,18 @@ function Header() {
           >
             Call us
           </a>
-          <a
-            href="#book"
+          <Link
+            to="/#book"
             className="rounded-full bg-brand-blue px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
           >
             Book a clean
-          </a>
+          </Link>
         </div>
 
         <button
           type="button"
           aria-label="Toggle menu"
+          aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 md:hidden"
         >
@@ -57,24 +59,24 @@ function Header() {
 
       {open && (
         <div className="border-t border-slate-100 bg-white md:hidden">
-          <div className="mx-auto flex max-w-6xl flex-col gap-1 px-6 py-3">
+          <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
             {links.map((l) => (
-              <a
+              <Link
                 key={l.label}
-                href={l.href}
+                to={l.to}
                 onClick={closeOnClick}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-pink-soft hover:text-brand-blue"
               >
                 {l.label}
-              </a>
+              </Link>
             ))}
-            <a
-              href="#book"
+            <Link
+              to="/#book"
               onClick={closeOnClick}
               className="mt-2 rounded-full bg-brand-blue px-5 py-2 text-center text-sm font-medium text-white"
             >
               Book a clean
-            </a>
+            </Link>
           </div>
         </div>
       )}
