@@ -4,7 +4,9 @@
       "Bash(npm view *)",
       "Bash(npm pack *)",
       "Bash(tar -xzf \"c:\\\\Users\\\\USER\\\\Desktop\\\\speedtouch\\\\.tmp-pack\\\\rolldown-binding-win32-x64-msvc-1.0.0-rc.17.tgz\" -C \"c:\\\\Users\\\\USER\\\\Desktop\\\\speedtouch\\\\node_modules\\\\@rolldown\\\\binding-win32-x64-msvc\" --strip-components=1)",
-      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\nContent-Type: %{content_type}\\\\nContent-Length: %{size_download}\\\\n\" -H \"Origin: http://localhost:5173\" -H \"Referer: http://localhost:5173/\" \"https://assets.mixkit.co/videos/4396/4396-720.mp4\")"
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\nContent-Type: %{content_type}\\\\nContent-Length: %{size_download}\\\\n\" -H \"Origin: http://localhost:5173\" -H \"Referer: http://localhost:5173/\" \"https://assets.mixkit.co/videos/4396/4396-720.mp4\")",
+      "Bash(taskkill /F /FI \"WINDOWTITLE eq *vite*\")",
+      "Bash(taskkill /F /IM node.exe /FI \"MEMUSAGE gt 50000\")"
     ]
   }
 }

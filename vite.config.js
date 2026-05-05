@@ -11,6 +11,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon.svg'],
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         runtimeCaching: [
