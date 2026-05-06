@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import { products } from '../data/products'
+import { useCart } from '../context/CartContext'
 
 const featured = products.slice(0, 6)
 
 function Products() {
+  const { addItem } = useCart()
+
   return (
     <section id="products" className="bg-white py-12 md:py-20">
       <div className="mx-auto max-w-6xl">
@@ -46,10 +49,10 @@ function Products() {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
                 {featured.map((p) => (
                   <article
-                    key={p.name}
+                    key={p.id}
                     className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-brand-blue/40 hover:shadow-md hover:shadow-brand-blue/5"
                   >
-                    <Link to="/products" className="group block">
+                    <Link to={`/products/${p.id}`} className="group block">
                       <div className="relative aspect-square overflow-hidden bg-slate-100">
                         <img
                           src={p.image}
@@ -76,6 +79,7 @@ function Products() {
                     <div className="mt-2 px-3 pb-3 lg:hidden">
                       <button
                         type="button"
+                        onClick={() => addItem(p)}
                         className="w-full rounded-full bg-brand-blue px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
                       >
                         Add to cart

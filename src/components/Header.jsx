@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ShoppingBag } from 'lucide-react'
 import Logo from './Logo'
+import { useCart } from '../context/CartContext'
 
 const links = [
   { label: 'Home', to: '/' },
@@ -13,9 +15,26 @@ const links = [
 function Header() {
   const [open, setOpen] = useState(false)
   const closeOnClick = () => setOpen(false)
+  const { count, openDrawer } = useCart()
+
+  const CartButton = ({ className = '' }) => (
+    <button
+      type="button"
+      onClick={openDrawer}
+      aria-label={`Open cart (${count} ${count === 1 ? 'item' : 'items'})`}
+      className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-brand-blue ${className}`}
+    >
+      <ShoppingBag className="h-5 w-5" />
+      {count > 0 && (
+        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-pink-deep px-1 text-[10px] font-bold text-white tabular-nums">
+          {count > 99 ? '99+' : count}
+        </span>
+      )}
+    </button>
+  )
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Logo />
 
@@ -31,30 +50,28 @@ function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="tel:+10000000000"
-            className="text-sm font-medium text-slate-600 transition hover:text-brand-blue"
-          >
-            Call us
-          </a>
+        <div className="hidden items-center gap-1 md:flex">
+          <CartButton />
           <Link
             to="/#book"
-            className="rounded-full bg-brand-blue px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+            className="ml-2 rounded-full bg-brand-blue px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
           >
             Book a clean
           </Link>
         </div>
 
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 md:hidden"
-        >
-          <span className="text-2xl leading-none">{open ? '×' : '☰'}</span>
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <CartButton />
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+          >
+            <span className="text-2xl leading-none">{open ? '×' : '☰'}</span>
+          </button>
+        </div>
       </div>
 
       {open && (
