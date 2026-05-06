@@ -8,6 +8,7 @@ import InstallPrompt from './components/InstallPrompt'
 import CartDrawer from './components/CartDrawer'
 import Toast from './components/Toast'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
+import AdminLayout from './components/admin/AdminLayout'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 
@@ -18,7 +19,13 @@ const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
+const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'))
 const AdminProductFormPage = lazy(() => import('./pages/admin/AdminProductFormPage'))
+const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'))
+const AdminOrderDetailPage = lazy(() => import('./pages/admin/AdminOrderDetailPage'))
+const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'))
+const AdminCustomerDetailPage = lazy(() => import('./pages/admin/AdminCustomerDetailPage'))
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'))
 
 function PageLoader() {
   return (
@@ -38,7 +45,7 @@ function Shell() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {!isAdmin && <Header />}
-      <main className="flex-1">
+      <main className={isAdmin ? '' : 'flex-1'}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -47,31 +54,25 @@ function Shell() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order/confirmation" element={<OrderConfirmationPage />} />
+
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
-              path="/admin"
               element={
                 <ProtectedAdminRoute>
-                  <AdminDashboardPage />
+                  <AdminLayout />
                 </ProtectedAdminRoute>
               }
-            />
-            <Route
-              path="/admin/products/new"
-              element={
-                <ProtectedAdminRoute>
-                  <AdminProductFormPage />
-                </ProtectedAdminRoute>
-              }
-            />
-            <Route
-              path="/admin/products/:id/edit"
-              element={
-                <ProtectedAdminRoute>
-                  <AdminProductFormPage />
-                </ProtectedAdminRoute>
-              }
-            />
+            >
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/orders" element={<AdminOrdersPage />} />
+              <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
+              <Route path="/admin/customers" element={<AdminCustomersPage />} />
+              <Route path="/admin/customers/:id" element={<AdminCustomerDetailPage />} />
+              <Route path="/admin/products" element={<AdminProductsPage />} />
+              <Route path="/admin/products/new" element={<AdminProductFormPage />} />
+              <Route path="/admin/products/:id/edit" element={<AdminProductFormPage />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            </Route>
           </Routes>
         </Suspense>
       </main>
