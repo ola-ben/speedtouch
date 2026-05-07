@@ -80,11 +80,19 @@ function Products() {
                           src={p.image}
                           alt={p.name}
                           loading="lazy"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                          className={`h-full w-full object-cover transition duration-300 group-hover:scale-105 ${
+                            p.stock === 0 ? 'opacity-60 grayscale' : ''
+                          }`}
                         />
-                        <span className="absolute right-1.5 top-1.5 rounded bg-brand-pink-soft px-1.5 py-0.5 text-[10px] font-bold text-brand-pink-deep">
-                          -{p.discount}%
-                        </span>
+                        {p.stock === 0 ? (
+                          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900/85 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                            Sold out
+                          </span>
+                        ) : (
+                          <span className="absolute right-1.5 top-1.5 rounded bg-brand-pink-soft px-1.5 py-0.5 text-[10px] font-bold text-brand-pink-deep">
+                            -{p.discount}%
+                          </span>
+                        )}
                       </div>
                       <div className="px-3 pt-3">
                         <h4 className="line-clamp-2 min-h-[2.4em] text-xs leading-snug text-slate-800 md:text-sm">
