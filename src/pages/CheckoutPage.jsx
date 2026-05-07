@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { ChevronRight, CreditCard, Lock, MapPin, Store, Truck } from 'lucide-react'
+import { ChevronRight, Lock, MapPin, ShieldCheck, Store, Truck } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { createOrder, generateOrderId } from '../lib/orders'
 import { isSupabaseConfigured } from '../lib/supabase'
+import { isPaystackConfigured, openPaystack } from '../lib/paystack'
 
 const SHIPPING_THRESHOLD = 40000
 const SHIPPING_COST = 2500
@@ -34,10 +35,12 @@ function CheckoutPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
-    setSubmitting(true)
 
     const fd = new FormData(e.currentTarget)
-    const customerName = `${fd.get('firstName') ?? ''} ${fd.get('lastName') ?? ''}`.trim()
+    const customerEmail = fd.get('email')
+    const customerPhone = fd.get('phone')
+    const customerName =
+      `${fd.get('firstName') ?? ''} ${fd.get('lastName') ?? ''}`.trim()
     const orderId = generateOrderId()
 
     const shippingAddress = isPickup
@@ -50,19 +53,21 @@ function CheckoutPage() {
           country: fd.get('country') ?? 'Nigeria',
         }
 
-    try {
+    const finishOrder = async (paymentReference, status) => {
       if (isSupabaseConfigured) {
         await createOrder({
           id: orderId,
           customerName,
-          customerEmail: fd.get('email'),
-          customerPhone: fd.get('phone'),
+          customerEmail,
+          customerPhone,
           deliveryMethod,
           shippingAddress,
-          paymentMethod: 'card',
+          paymentMethod: 'paystack',
+          paymentReference: paymentReference ?? null,
           subtotal,
           shipping,
           total,
+          status,
           items: items.map((it) => ({
             productId: it.id,
             name: it.name,
@@ -71,17 +76,55 @@ function CheckoutPage() {
             quantity: it.quantity,
           })),
         })
-      } else {
-        // Demo path — pretend it succeeded after a beat.
-        await new Promise((res) => setTimeout(res, 600))
       }
       clearCart()
       navigate(
         `/order/confirmation?id=${orderId}&method=${deliveryMethod}`,
         { replace: true },
       )
+    }
+
+    setSubmitting(true)
+
+    if (!isPaystackConfigured) {
+      // No Paystack key — fall back to a soft demo flow so checkout still works
+      // in environments without the env var (e.g., a fresh fork).
+      try {
+        await new Promise((res) => setTimeout(res, 600))
+        await finishOrder(null, 'pending')
+      } catch (err) {
+        setError(err.message || 'Failed to place order')
+        setSubmitting(false)
+      }
+      return
+    }
+
+    try {
+      const response = await openPaystack({
+        email: customerEmail,
+        amount: total,
+        reference: orderId,
+        metadata: {
+          orderId,
+          customerName,
+          customerPhone,
+          deliveryMethod,
+          custom_fields: [
+            {
+              display_name: 'Order ID',
+              variable_name: 'order_id',
+              value: orderId,
+            },
+          ],
+        },
+      })
+      await finishOrder(response.reference ?? orderId, 'paid')
     } catch (err) {
-      setError(err.message || 'Failed to place order')
+      if (err && err.cancelled) {
+        setError('Payment cancelled. You can try again.')
+      } else {
+        setError(err.message || 'Payment failed. Please try again.')
+      }
       setSubmitting(false)
     }
   }
@@ -184,19 +227,25 @@ function CheckoutPage() {
 
             <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <legend className="flex items-center gap-2 px-2 text-sm font-semibold text-slate-900">
-                <CreditCard className="h-4 w-4 text-brand-blue" />
+                <ShieldCheck className="h-4 w-4 text-brand-blue" />
                 Payment
               </legend>
-              <div className="grid gap-4">
-                <Field label="Card number" name="cardNumber" placeholder="0000 0000 0000 0000" required autoComplete="cc-number" />
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Expiry" name="expiry" placeholder="MM / YY" required autoComplete="cc-exp" />
-                  <Field label="CVC" name="cvc" placeholder="123" required autoComplete="cc-csc" />
+              <div className="rounded-xl bg-slate-50 p-4">
+                <div className="flex items-center gap-3">
+                  <PaystackLogo />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-slate-900">
+                      Pay securely with Paystack
+                    </div>
+                    <p className="mt-0.5 text-xs text-slate-600">
+                      Card, bank transfer, or USSD. Card details stay with
+                      Paystack — never on our servers.
+                    </p>
+                  </div>
                 </div>
-                <Field label="Name on card" name="cardName" required autoComplete="cc-name" />
               </div>
               <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-500">
-                <Lock className="h-3 w-3" /> Demo checkout — no real charge will be made.
+                <Lock className="h-3 w-3" /> 256-bit SSL · PCI DSS compliant
               </p>
             </fieldset>
           </div>
@@ -251,7 +300,7 @@ function CheckoutPage() {
                 disabled={submitting}
                 className="mt-5 w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-60"
               >
-                {submitting ? 'Placing order…' : `Pay ₦${total.toLocaleString('en-NG')}`}
+                {submitting ? 'Processing…' : `Pay ₦${total.toLocaleString('en-NG')} with Paystack`}
               </button>
             </div>
           </aside>
@@ -290,6 +339,19 @@ function DeliveryOption({ icon: Icon, title, body, selected, onClick }) {
         }`}
       />
     </button>
+  )
+}
+
+function PaystackLogo() {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      className="h-9 w-9 shrink-0 rounded-lg"
+      aria-label="Paystack"
+    >
+      <rect width="32" height="32" rx="8" fill="#011B33" />
+      <path d="M7 9h12v2.5H7V9zm0 4.5h18V16H7v-2.5zM7 18h12v2.5H7V18zm0 4.5h7V25H7v-2.5z" fill="#00C3F7" />
+    </svg>
   )
 }
 

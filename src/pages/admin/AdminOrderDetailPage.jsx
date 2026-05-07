@@ -292,6 +292,16 @@ function AdminOrderDetailPage() {
                     {order.paymentMethod || 'card'}
                   </dd>
                 </div>
+                {order.paymentReference && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wider text-slate-500">
+                      Paystack reference
+                    </dt>
+                    <dd className="mt-0.5 break-all font-mono text-xs text-slate-900">
+                      {order.paymentReference}
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-xs uppercase tracking-wider text-slate-500">Status</dt>
                   <dd className="mt-0.5 text-slate-900">
