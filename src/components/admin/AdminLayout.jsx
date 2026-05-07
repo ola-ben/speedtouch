@@ -5,6 +5,7 @@ import {
   ShoppingBag,
   Users,
   Package,
+  Sparkles,
   Settings,
   Menu,
   X,
@@ -21,6 +22,7 @@ const nav = [
   { to: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { to: '/admin/customers', label: 'Customers', icon: Users },
   { to: '/admin/products', label: 'Products', icon: Package },
+  { to: '/admin/services', label: 'Services', icon: Sparkles },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 

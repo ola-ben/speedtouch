@@ -21,6 +21,8 @@ const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'))
 const AdminProductFormPage = lazy(() => import('./pages/admin/AdminProductFormPage'))
+const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'))
+const AdminServiceFormPage = lazy(() => import('./pages/admin/AdminServiceFormPage'))
 const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'))
 const AdminOrderDetailPage = lazy(() => import('./pages/admin/AdminOrderDetailPage'))
 const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'))
@@ -71,6 +73,9 @@ function Shell() {
               <Route path="/admin/products" element={<AdminProductsPage />} />
               <Route path="/admin/products/new" element={<AdminProductFormPage />} />
               <Route path="/admin/products/:id/edit" element={<AdminProductFormPage />} />
+              <Route path="/admin/services" element={<AdminServicesPage />} />
+              <Route path="/admin/services/new" element={<AdminServiceFormPage />} />
+              <Route path="/admin/services/:id/edit" element={<AdminServiceFormPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
             </Route>
           </Routes>
