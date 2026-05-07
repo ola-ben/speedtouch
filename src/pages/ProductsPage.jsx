@@ -4,6 +4,7 @@ import { ChevronRight, Search, X } from 'lucide-react'
 import { categories } from '../data/products'
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
+import StockBar from '../components/StockBar'
 
 function ProductsPage() {
   const [category, setCategory] = useState('all')
@@ -195,6 +196,7 @@ function ProductsPage() {
                     <div className="text-[10px] text-slate-400 line-through md:text-xs">
                       ₦{p.original.toLocaleString('en-NG')}
                     </div>
+                    <StockBar stock={p.stock} />
                   </div>
                 </Link>
                 <div className="mt-2 px-3 pb-3">

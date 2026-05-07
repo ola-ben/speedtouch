@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
+import StockBar from './StockBar'
 import { useProducts } from '../hooks/useProducts'
 
 function Products() {
@@ -104,6 +105,7 @@ function Products() {
                         <div className="text-[10px] text-slate-400 line-through md:text-xs">
                           ₦{p.original.toLocaleString('en-NG')}
                         </div>
+                        <StockBar stock={p.stock} />
                       </div>
                     </Link>
                   </article>
