@@ -11,8 +11,10 @@ import {
   ExternalLink,
   Bell,
   Search,
+  LogOut,
 } from 'lucide-react'
 import Logo from '../Logo'
+import { useAuth } from '../../context/AuthContext'
 
 const nav = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
@@ -70,6 +72,8 @@ function SidebarContent({ onNavigate }) {
 
 function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, signOut } = useAuth()
+  const initial = user?.email?.[0]?.toUpperCase() ?? 'A'
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -128,16 +132,25 @@ function AdminLayout() {
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-pink-deep" />
             </button>
             <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 sm:flex">
-              <img
-                src="https://i.pravatar.cc/64?img=68"
-                alt=""
-                className="h-6 w-6 rounded-full object-cover"
-              />
-              <div className="text-left text-xs leading-tight">
-                <div className="font-semibold text-slate-900">Admin</div>
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-brand-blue to-brand-pink-deep text-xs font-semibold text-white">
+                {initial}
+              </span>
+              <div className="max-w-35 truncate text-left text-xs leading-tight">
+                <div className="truncate font-semibold text-slate-900">
+                  {user?.email ?? 'Admin'}
+                </div>
                 <div className="text-slate-500">Speedtouch</div>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={signOut}
+              aria-label="Sign out"
+              title="Sign out"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-brand-pink-deep"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </header>
 
