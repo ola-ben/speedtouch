@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
-import { products } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
-
-const featured = products.slice(0, 6)
 
 function Products() {
   const { addItem } = useCart()
+  const { products, loading } = useProducts()
+  const featured = products.slice(0, 6)
 
   return (
     <section id="products" className="bg-white py-12 md:py-20">
@@ -46,6 +46,30 @@ function Products() {
             </div>
 
             <div className="bg-white p-3 md:p-4">
+              {loading && featured.length === 0 ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="overflow-hidden rounded-lg border border-slate-200 bg-white"
+                    >
+                      <div className="aspect-square animate-pulse bg-slate-100" />
+                      <div className="space-y-2 p-3">
+                        <div className="h-3 animate-pulse rounded bg-slate-100" />
+                        <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+                        <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : featured.length === 0 ? (
+                <p className="px-2 py-12 text-center text-sm text-slate-500">
+                  No products yet.{' '}
+                  <Link to="/admin/products/new" className="font-medium text-brand-blue hover:underline">
+                    Add the first one →
+                  </Link>
+                </p>
+              ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
                 {featured.map((p) => (
                   <article
@@ -88,6 +112,7 @@ function Products() {
                   </article>
                 ))}
               </div>
+              )}
             </div>
           </div>
         </div>

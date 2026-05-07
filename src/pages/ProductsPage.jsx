@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Search, X } from 'lucide-react'
-import { products, categories } from '../data/products'
+import { categories } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 
 function ProductsPage() {
@@ -9,6 +10,7 @@ function ProductsPage() {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('featured')
   const { addItem } = useCart()
+  const { products, loading, error } = useProducts()
 
   const filtered = useMemo(() => {
     let list = products
@@ -31,7 +33,7 @@ function ProductsPage() {
       default:
         return list
     }
-  }, [category, query, sort])
+  }, [category, query, sort, products])
 
   return (
     <section className="bg-white py-10 md:py-16">
@@ -108,19 +110,53 @@ function ProductsPage() {
           ))}
         </div>
 
-        {filtered.length === 0 ? (
+        {error && (
+          <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-lg border border-slate-200 bg-white"
+              >
+                <div className="aspect-square animate-pulse bg-slate-100" />
+                <div className="space-y-2 p-3">
+                  <div className="h-3 animate-pulse rounded bg-slate-100" />
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                  <div className="mt-2 h-7 animate-pulse rounded-full bg-slate-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="mt-12 rounded-2xl border border-dashed border-slate-200 py-16 text-center text-sm text-slate-500">
-            No products match your search.{' '}
-            <button
-              type="button"
-              onClick={() => {
-                setQuery('')
-                setCategory('all')
-              }}
-              className="font-medium text-brand-blue hover:underline"
-            >
-              Reset filters
-            </button>
+            {products.length === 0 ? (
+              <>
+                No products yet.{' '}
+                <Link to="/admin/products/new" className="font-medium text-brand-blue hover:underline">
+                  Add the first one →
+                </Link>
+              </>
+            ) : (
+              <>
+                No products match your search.{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery('')
+                    setCategory('all')
+                  }}
+                  className="font-medium text-brand-blue hover:underline"
+                >
+                  Reset filters
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

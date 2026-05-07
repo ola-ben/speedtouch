@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronRight, Star, Plus, Minus, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
-import { products } from '../data/products'
+import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 
 function NotFound() {
@@ -25,9 +25,21 @@ function NotFound() {
 
 function ProductDetailPage() {
   const { id } = useParams()
+  const { products, loading } = useProducts()
   const product = products.find((p) => p.id === id)
   const [qty, setQty] = useState(1)
   const { addItem, openDrawer } = useCart()
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div
+          aria-label="Loading"
+          className="h-10 w-10 animate-spin rounded-full border-4 border-brand-blue/20 border-t-brand-blue"
+        />
+      </div>
+    )
+  }
 
   if (!product) return <NotFound />
 
