@@ -195,66 +195,113 @@ function AdminOrderDetailPage() {
           <aside className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <h3 className="text-sm font-semibold text-slate-900">Customer</h3>
-              <p className="mt-3 text-sm font-medium text-slate-900">
-                {order.customerName}
-              </p>
-              <div className="mt-3 space-y-2 text-sm text-slate-700">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5 text-slate-400" />
-                  <a
-                    href={`mailto:${order.customerEmail}`}
-                    className="truncate hover:text-brand-blue"
-                  >
-                    {order.customerEmail}
-                  </a>
+              <dl className="mt-3 space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Name</dt>
+                  <dd className="mt-0.5 font-medium text-slate-900">
+                    {order.customerName || '—'}
+                  </dd>
                 </div>
-                {order.customerPhone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-3.5 w-3.5 text-slate-400" />
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Email</dt>
+                  <dd className="mt-0.5 flex items-center gap-2 text-slate-900">
+                    <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
                     <a
-                      href={`tel:${order.customerPhone}`}
-                      className="hover:text-brand-blue"
+                      href={`mailto:${order.customerEmail}`}
+                      className="truncate hover:text-brand-blue"
                     >
-                      {order.customerPhone}
+                      {order.customerEmail || '—'}
                     </a>
-                  </div>
-                )}
-              </div>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Phone</dt>
+                  <dd className="mt-0.5 flex items-center gap-2 text-slate-900">
+                    <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    {order.customerPhone ? (
+                      <a
+                        href={`tel:${order.customerPhone}`}
+                        className="hover:text-brand-blue"
+                      >
+                        {order.customerPhone}
+                      </a>
+                    ) : (
+                      <span className="text-slate-500">—</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                {isPickup ? <Store className="h-4 w-4 text-brand-blue" /> : <Truck className="h-4 w-4 text-brand-blue" />}
-                {isPickup ? 'Pickup' : 'Shipping address'}
+                {isPickup ? (
+                  <Store className="h-4 w-4 text-brand-blue" />
+                ) : (
+                  <Truck className="h-4 w-4 text-brand-blue" />
+                )}
+                Delivery
               </h3>
-              {isPickup ? (
-                <div className="mt-3 text-sm text-slate-700">
-                  Customer will collect from the Bodija store.
+              <dl className="mt-3 space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Method</dt>
+                  <dd className="mt-0.5">
+                    <span className="inline-flex rounded-full bg-brand-blue-soft px-2.5 py-0.5 text-xs font-medium text-brand-blue">
+                      {isPickup ? 'Pick up at station' : 'Home delivery'}
+                    </span>
+                  </dd>
                 </div>
-              ) : addr ? (
-                <div className="mt-3 flex gap-2 text-sm text-slate-700">
-                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
-                  <div>
-                    <div>{addr.line1}</div>
-                    <div>
-                      {addr.city}
-                      {addr.state ? `, ${addr.state}` : ''}{' '}
-                      {addr.postal}
-                    </div>
-                    <div>{addr.country ?? 'Nigeria'}</div>
-                  </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">
+                    {isPickup ? 'Pickup location' : 'Shipping address'}
+                  </dt>
+                  <dd className="mt-1 flex gap-2 text-slate-700">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    {isPickup ? (
+                      <div>
+                        <div className="font-medium text-slate-900">Speedtouch — Bodija</div>
+                        <div>7 Oluyoro St, off Awolowo Avenue</div>
+                        <div>Old Bodija, Lagelu 000234</div>
+                        <div>Oyo, Nigeria</div>
+                      </div>
+                    ) : addr ? (
+                      <div>
+                        <div>{addr.line1 || '—'}</div>
+                        <div>
+                          {addr.city}
+                          {addr.state ? `, ${addr.state}` : ''}{' '}
+                          {addr.postal}
+                        </div>
+                        <div>{addr.country ?? 'Nigeria'}</div>
+                      </div>
+                    ) : (
+                      <span className="text-slate-500">No address on file.</span>
+                    )}
+                  </dd>
                 </div>
-              ) : (
-                <p className="mt-3 text-sm text-slate-500">No address on file.</p>
-              )}
+              </dl>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <h3 className="text-sm font-semibold text-slate-900">Payment</h3>
-              <div className="mt-3 flex items-center gap-2 text-sm capitalize text-slate-700">
-                <CreditCard className="h-3.5 w-3.5 text-slate-400" />
-                {order.paymentMethod}
-              </div>
+              <dl className="mt-3 space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Method</dt>
+                  <dd className="mt-0.5 flex items-center gap-2 capitalize text-slate-900">
+                    <CreditCard className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    {order.paymentMethod || 'card'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-slate-500">Status</dt>
+                  <dd className="mt-0.5 text-slate-900">
+                    <StatusPill status={order.status} />
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-[11px] text-slate-400">
+                Card numbers are never stored — handled by the payment processor.
+              </p>
             </div>
           </aside>
         </div>
