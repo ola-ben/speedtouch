@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import { useProducts } from '../hooks/useProducts'
-import { useCart } from '../context/CartContext'
 
 function Products() {
-  const { addItem } = useCart()
   const { products, loading } = useProducts()
   const featured = products.slice(0, 6)
 
@@ -100,15 +98,6 @@ function Products() {
                         </div>
                       </div>
                     </Link>
-                    <div className="mt-2 px-3 pb-3 lg:hidden">
-                      <button
-                        type="button"
-                        onClick={() => addItem(p)}
-                        className="w-full rounded-full bg-brand-blue px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
-                      >
-                        Add to cart
-                      </button>
-                    </div>
                   </article>
                 ))}
               </div>

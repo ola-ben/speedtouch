@@ -7,9 +7,10 @@ import {
   Package,
   AlertTriangle,
 } from 'lucide-react'
-import { orders, STATUS_META } from '../../data/orders'
+import { STATUS_META } from '../../data/orders'
 import { customers } from '../../data/customers'
 import { useProducts } from '../../hooks/useProducts'
+import { useOrders } from '../../hooks/useOrders'
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`
@@ -60,6 +61,7 @@ function StatusPill({ status }) {
 
 function AdminDashboardPage() {
   const { products } = useProducts()
+  const { orders } = useOrders()
 
   const totalRevenue = orders
     .filter((o) => !['cancelled', 'refunded'].includes(o.status))

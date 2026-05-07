@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ChevronRight, Mail, Phone, MapPin, CreditCard } from 'lucide-react'
-import { findOrder, STATUS_META } from '../../data/orders'
-import { findCustomer } from '../../data/customers'
+import { ChevronRight, Mail, Phone, MapPin, CreditCard, Store, Truck } from 'lucide-react'
+import { STATUS_META } from '../../data/orders'
+import { ORDER_STATUSES, updateOrderStatus } from '../../lib/orders'
+import { useOrder } from '../../hooks/useOrders'
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`
@@ -21,8 +23,27 @@ function StatusPill({ status }) {
 
 function AdminOrderDetailPage() {
   const { id } = useParams()
-  const order = findOrder(id)
-  const customer = order ? findCustomer(order.customerId) : null
+  const { order, loading, error, setOrder } = useOrder(id)
+  const [updating, setUpdating] = useState(false)
+  const [updateError, setUpdateError] = useState(null)
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-blue/20 border-t-brand-blue" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-2xl rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      </div>
+    )
+  }
 
   if (!order) {
     return (
@@ -40,6 +61,22 @@ function AdminOrderDetailPage() {
     )
   }
 
+  const handleStatusChange = async (next) => {
+    setUpdating(true)
+    setUpdateError(null)
+    try {
+      const updated = await updateOrderStatus(order.id, next)
+      setOrder(updated)
+    } catch (err) {
+      setUpdateError(err.message || 'Status update failed')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  const isPickup = order.deliveryMethod === 'pickup'
+  const addr = order.shippingAddress
+
   return (
     <div className="px-4 py-8 sm:px-6 md:py-10">
       <div className="mx-auto max-w-5xl">
@@ -53,7 +90,7 @@ function AdminOrderDetailPage() {
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <h1 className="font-mono text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
                 #{order.id}
               </h1>
@@ -70,21 +107,28 @@ function AdminOrderDetailPage() {
               })}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-brand-blue hover:text-brand-blue"
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="text-xs font-medium text-slate-600">Status</label>
+            <select
+              value={order.status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              disabled={updating}
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 capitalize focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20 disabled:opacity-50"
             >
-              Print
-            </button>
-            <button
-              type="button"
-              className="rounded-full bg-brand-blue px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
-            >
-              Mark fulfilled
-            </button>
+              {ORDER_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_META[s]?.label ?? s}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
+
+        {updateError && (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+            {updateError}
+          </p>
+        )}
 
         <div className="mt-8 grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -93,25 +137,32 @@ function AdminOrderDetailPage() {
                 <h2 className="text-base font-semibold text-slate-900">Items</h2>
               </header>
               <ul className="divide-y divide-slate-100">
-                {order.items.map((it) => (
-                  <li key={it.productId} className="flex items-center gap-4 px-5 py-4">
-                    <Link
-                      to={`/products/${it.productId}`}
-                      target="_blank"
-                      rel="noopener"
-                      className="block h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100"
-                    >
-                      <div className="h-full w-full bg-gradient-to-br from-brand-blue-soft to-brand-pink-soft" />
-                    </Link>
-                    <div className="min-w-0 flex-1">
+                {order.items.map((it, i) => (
+                  <li key={`${it.productId ?? 'item'}-${i}`} className="flex items-center gap-4 px-5 py-4">
+                    {it.productId ? (
                       <Link
                         to={`/products/${it.productId}`}
                         target="_blank"
                         rel="noopener"
-                        className="line-clamp-2 text-sm font-medium text-slate-900 hover:text-brand-blue"
+                        className="block h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100"
                       >
-                        {it.name}
+                        {it.image ? (
+                          <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full bg-linear-to-br from-brand-blue-soft to-brand-pink-soft" />
+                        )}
                       </Link>
+                    ) : (
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100">
+                        {it.image && (
+                          <img src={it.image} alt="" className="h-full w-full object-cover" />
+                        )}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="line-clamp-2 text-sm font-medium text-slate-900">
+                        {it.name}
+                      </div>
                       <div className="mt-0.5 text-xs text-slate-500">
                         {formatNaira(it.price)} × {it.quantity}
                       </div>
@@ -128,7 +179,7 @@ function AdminOrderDetailPage() {
                   <dd className="tabular-nums">{formatNaira(order.subtotal)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-slate-600">Shipping</dt>
+                  <dt className="text-slate-600">{isPickup ? 'Pickup' : 'Shipping'}</dt>
                   <dd className="tabular-nums">
                     {order.shipping === 0 ? 'Free' : formatNaira(order.shipping)}
                   </dd>
@@ -144,59 +195,63 @@ function AdminOrderDetailPage() {
           <aside className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <h3 className="text-sm font-semibold text-slate-900">Customer</h3>
-              {customer ? (
-                <Link
-                  to={`/admin/customers/${customer.id}`}
-                  className="mt-3 flex items-center gap-3 rounded-lg p-2 -m-2 transition hover:bg-slate-50"
-                >
-                  <img
-                    src={customer.avatar}
-                    alt=""
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-slate-900">
-                      {customer.name}
-                    </div>
-                    <div className="truncate text-xs text-slate-500">
-                      {customer.orders} order{customer.orders === 1 ? '' : 's'} · {formatNaira(customer.spent)} spent
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <p className="mt-3 text-sm text-slate-500">{order.customerName}</p>
-              )}
-              {customer && (
-                <div className="mt-4 space-y-2 text-sm text-slate-700">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 text-slate-400" />
-                    <span className="truncate">{customer.email}</span>
-                  </div>
+              <p className="mt-3 text-sm font-medium text-slate-900">
+                {order.customerName}
+              </p>
+              <div className="mt-3 space-y-2 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-slate-400" />
+                  <a
+                    href={`mailto:${order.customerEmail}`}
+                    className="truncate hover:text-brand-blue"
+                  >
+                    {order.customerEmail}
+                  </a>
+                </div>
+                {order.customerPhone && (
                   <div className="flex items-center gap-2">
                     <Phone className="h-3.5 w-3.5 text-slate-400" />
-                    {customer.phone}
+                    <a
+                      href={`tel:${order.customerPhone}`}
+                      className="hover:text-brand-blue"
+                    >
+                      {order.customerPhone}
+                    </a>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            {customer && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                <h3 className="text-sm font-semibold text-slate-900">Shipping address</h3>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                {isPickup ? <Store className="h-4 w-4 text-brand-blue" /> : <Truck className="h-4 w-4 text-brand-blue" />}
+                {isPickup ? 'Pickup' : 'Shipping address'}
+              </h3>
+              {isPickup ? (
+                <div className="mt-3 text-sm text-slate-700">
+                  Customer will collect from the Bodija store.
+                </div>
+              ) : addr ? (
                 <div className="mt-3 flex gap-2 text-sm text-slate-700">
                   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
                   <div>
-                    <div>{customer.address}</div>
-                    <div>{customer.city}, {customer.state}</div>
-                    <div>Nigeria</div>
+                    <div>{addr.line1}</div>
+                    <div>
+                      {addr.city}
+                      {addr.state ? `, ${addr.state}` : ''}{' '}
+                      {addr.postal}
+                    </div>
+                    <div>{addr.country ?? 'Nigeria'}</div>
                   </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="mt-3 text-sm text-slate-500">No address on file.</p>
+              )}
+            </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <h3 className="text-sm font-semibold text-slate-900">Payment</h3>
-              <div className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+              <div className="mt-3 flex items-center gap-2 text-sm capitalize text-slate-700">
                 <CreditCard className="h-3.5 w-3.5 text-slate-400" />
                 {order.paymentMethod}
               </div>

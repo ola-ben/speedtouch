@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
-import { orders, STATUS_META } from '../../data/orders'
+import { STATUS_META } from '../../data/orders'
+import { useOrders } from '../../hooks/useOrders'
 
 const STATUS_TABS = [
   'all',
@@ -33,6 +34,7 @@ function formatNaira(n) {
 function AdminOrdersPage() {
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
+  const { orders, loading, error } = useOrders()
 
   const filtered = useMemo(() => {
     let list = [...orders].sort(
@@ -48,7 +50,7 @@ function AdminOrdersPage() {
       )
     }
     return list
-  }, [tab, query])
+  }, [tab, query, orders])
 
   return (
     <div className="px-4 py-8 sm:px-6 md:py-10">
@@ -102,10 +104,22 @@ function AdminOrdersPage() {
           })}
         </div>
 
+        {error && (
+          <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-blue/20 border-t-brand-blue" />
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="px-6 py-16 text-center text-sm text-slate-500">
-              No orders match your filters.
+              {orders.length === 0
+                ? 'No orders yet. They will appear here when customers check out.'
+                : 'No orders match your filters.'}
             </div>
           ) : (
             <table className="w-full text-left text-sm">
