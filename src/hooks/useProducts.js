@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react'
 import { fetchProductById, fetchProducts } from '../lib/products'
 import { isSupabaseConfigured } from '../lib/supabase'
-import { products as localProducts } from '../data/products'
+
+if (typeof window !== 'undefined' && !isSupabaseConfigured) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    '[Speedtouch] Supabase env vars are missing. ' +
+      'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables, then redeploy.',
+  )
+}
 
 export function useProducts() {
-  const [products, setProducts] = useState(() =>
-    isSupabaseConfigured ? [] : localProducts,
-  )
-  const [loading, setLoading] = useState(isSupabaseConfigured)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return
     let cancelled = false
+    setLoading(true)
     fetchProducts()
       .then((list) => {
         if (!cancelled) setProducts(list)
@@ -32,15 +37,13 @@ export function useProducts() {
 }
 
 export function useProduct(id) {
-  const [product, setProduct] = useState(() =>
-    isSupabaseConfigured ? null : localProducts.find((p) => p.id === id) ?? null,
-  )
-  const [loading, setLoading] = useState(isSupabaseConfigured)
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return
     let cancelled = false
+    setLoading(true)
     fetchProductById(id)
       .then((p) => {
         if (!cancelled) setProduct(p)

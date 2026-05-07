@@ -4,14 +4,12 @@ import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { deleteProduct, fetchProducts } from '../../lib/products'
 import { deleteProductImage } from '../../lib/storage'
 import { isSupabaseConfigured } from '../../lib/supabase'
-import { products as mockProducts } from '../../data/products'
 
 function AdminProductsPage() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(null)
-  const demoMode = !isSupabaseConfigured
 
   useEffect(() => {
     let cancelled = false
@@ -19,12 +17,8 @@ function AdminProductsPage() {
       setLoading(true)
       setError(null)
       try {
-        if (demoMode) {
-          if (!cancelled) setProducts(mockProducts)
-        } else {
-          const list = await fetchProducts()
-          if (!cancelled) setProducts(list)
-        }
+        const list = await fetchProducts()
+        if (!cancelled) setProducts(list)
       } catch (err) {
         if (!cancelled) setError(err.message || 'Failed to load products')
       } finally {
@@ -35,20 +29,18 @@ function AdminProductsPage() {
     return () => {
       cancelled = true
     }
-  }, [demoMode])
+  }, [])
 
   const handleDelete = async (product) => {
     if (!window.confirm(`Delete "${product.name}"? This can't be undone.`)) return
     setBusy(product.id)
     try {
-      if (!demoMode) {
-        await deleteProduct(product.id)
-        if (product.image) {
-          try {
-            await deleteProductImage(product.image)
-          } catch {
-            // best-effort
-          }
+      await deleteProduct(product.id)
+      if (product.image) {
+        try {
+          await deleteProductImage(product.image)
+        } catch {
+          // best-effort
         }
       }
       setProducts((list) => list.filter((p) => p.id !== product.id))
@@ -80,9 +72,11 @@ function AdminProductsPage() {
           </Link>
         </div>
 
-        {demoMode && (
+        {!isSupabaseConfigured && (
           <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Showing local mock products because Supabase isn't connected yet.
+            Supabase isn't connected. Add{' '}
+            <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
+            <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> to your environment.
           </div>
         )}
 

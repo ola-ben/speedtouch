@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { orders, STATUS_META } from '../../data/orders'
 import { customers } from '../../data/customers'
-import { products } from '../../data/products'
+import { useProducts } from '../../hooks/useProducts'
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`
@@ -59,6 +59,8 @@ function StatusPill({ status }) {
 }
 
 function AdminDashboardPage() {
+  const { products } = useProducts()
+
   const totalRevenue = orders
     .filter((o) => !['cancelled', 'refunded'].includes(o.status))
     .reduce((s, o) => s + o.total, 0)
