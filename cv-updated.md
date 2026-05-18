@@ -64,16 +64,17 @@ _React · Express · Supabase · PostgreSQL · Vercel · Render_
 - Implemented **Framer Motion** micro-interactions, mobile-first responsive design (5-tab bottom nav / desktop top nav), JWT-based RBAC via `app_metadata.role`, and a custom animated toast system using `useToaster()`.
 - Wrote a layered Express backend (`routes → middleware → controllers → db`) with helmet, CORS allow-listing, and centralized error handling — deployed via GitHub auto-deploys.
 
-### Speedtouch — Cinematic, installable landing site for a cleaning service
+### Speedtouch — Full-stack e-commerce platform for a Nigerian cleaning service
 
 **[speedtouch-virid.vercel.app](https://speedtouch-virid.vercel.app)**
-_React 19 · Vite · Tailwind CSS v4 · React Router 7 · Lucide / React Icons · vite-plugin-pwa · IntersectionObserver_
+_React 19 · Vite · Tailwind CSS v4 · React Router 7 · Supabase (Auth, Postgres, Storage, RLS, triggers) · Paystack · Lucide / React Icons · vite-plugin-pwa · IntersectionObserver_
 
-- Built a marketing site for a Nigerian cleaning service end-to-end: routed home and **/products** pages, a Jumia-style commerce strip with NGN pricing (`toLocaleString('en-NG')`), a service directory with mobile swipe carousel, and a brand-themed multi-section flow.
-- Designed a **cinematic hero** with an autoplaying CC0 video background (Mixkit, hotlink-friendly), `onError` graceful fallback to a poster image, `isolate` stacking context, and a faded white gradient overlay so the dark Fraunces headline reads cleanly over the moving footage on mobile and desktop.
-- Engineered a **mobile-first horizontal swipe carousel** (`snap-x snap-mandatory`, hidden scrollbar utility) with a live `1 / 6` index counter driven by `onScroll` distance-from-center math — and made entrance animations skip below `sm` via a custom `<Reveal>` component that respects `prefers-reduced-motion`.
-- Wired **route-level code splitting** with `React.lazy` + `<Suspense>`, a hash-aware `<ScrollToTop>` for cross-route nav (`/#services` from `/products`), and a CSS-keyframed marquee in Tailwind v4's `@theme` for a service ticker.
-- Made the site an **installable PWA** with `vite-plugin-pwa` (autoUpdate service worker, Workbox precache, custom SVG mark with maskable icon), and tuned **Vercel** deploy with SPA rewrites + 1-year `Cache-Control: immutable` on hashed assets and `must-revalidate` on `index.html`.
+- Shipped a complete storefront end-to-end: marketing home with services + Jumia-style product strip in NGN (`toLocaleString('en-NG')`), full `/products` listing with category filters & search, `/products/:id` detail with related items, slide-out cart drawer with `localStorage` persistence, **delivery-vs-pickup** checkout, order confirmation, and a protected `/admin` surface — all behind `React.lazy` + `<Suspense>` with hash-aware `<ScrollToTop>` for cross-route navigation.
+- Built the **admin dashboard** (Overview, Orders, Customers, Products, Services, Settings) behind a Supabase Auth gate with a sticky sidebar layout — revenue + order stat cards, low-stock alerts, image-upload forms wired to dedicated `product-images` / `service-images` storage buckets, and a per-order status dropdown that writes back to Postgres on change.
+- Designed the **Postgres schema** (products, services, orders, order_items) with split Row Level Security — public anonymous reads, anonymous order inserts, authenticated-only admin reads/updates — plus a `SECURITY DEFINER` trigger that **atomically decrements product stock** on every `order_items` insert (clamped at zero) so the front-end's stock-progress bars and "Sold out" overlays stay synced with the database.
+- Integrated **Paystack** payments via the inline popup with a promise-based wrapper (NGN→kobo conversion, resolves on success / rejects on customer-close); order rows only commit to Postgres after a successful charge so cancelled payments never pollute the orders table — and the Paystack reference round-trips from the client into Postgres and surfaces on the admin order detail.
+- Designed a **cinematic hero** with an autoplaying CC0 video (Mixkit, hotlink-friendly) + `onError` poster fallback, a mobile-first **swipe carousel** (`snap-x snap-mandatory`, live `1 / 6` index counter driven by `onScroll` distance-from-center math), CSS-keyframed marquee, and `<Reveal>` entrance animations that respect `prefers-reduced-motion` and skip below `sm`.
+- Made the site an **installable PWA** with `vite-plugin-pwa` (autoUpdate service worker, Workbox precache, `navigateFallbackDenylist` to stop SW from intercepting `/assets/*` chunks), a **platform-aware Install button** (`beforeinstallprompt` for Android/Chrome, share-sheet modal for iOS Safari), and tuned **Vercel** deploy with SPA rewrites + 1-year `Cache-Control: immutable` on hashed assets and `must-revalidate` on `index.html` / `sw.js`.
 
 ---
 

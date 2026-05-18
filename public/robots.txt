@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order/
+
+Sitemap: https://speedtouch-virid.vercel.app/sitemap.xml

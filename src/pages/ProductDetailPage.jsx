@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ChevronRight, Star, Plus, Minus, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 function NotFound() {
   return (
@@ -29,6 +30,11 @@ function ProductDetailPage() {
   const product = products.find((p) => p.id === id)
   const [qty, setQty] = useState(1)
   const { addItem, openDrawer } = useCart()
+
+  useDocumentTitle(
+    product ? product.name : 'Product',
+    product?.description || 'Shop quality cleaning supplies from Speedtouch.',
+  )
 
   if (loading) {
     return (

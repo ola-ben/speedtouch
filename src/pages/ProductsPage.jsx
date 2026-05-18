@@ -4,6 +4,7 @@ import { ChevronRight, Search, X } from 'lucide-react'
 import { categories } from '../data/products'
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import StockBar from '../components/StockBar'
 
 function ProductsPage() {
@@ -12,6 +13,11 @@ function ProductsPage() {
   const [sort, setSort] = useState('featured')
   const { addItem } = useCart()
   const { products, loading, error } = useProducts()
+
+  useDocumentTitle(
+    'Cleaning Supplies & Tools',
+    'Browse Speedtouch cleaning supplies, tools, and bundles — eco-friendly, durable, honestly priced in Naira.',
+  )
 
   const filtered = useMemo(() => {
     let list = products
