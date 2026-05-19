@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon.svg'],
+      includeAssets: ['favicon.png'],
       devOptions: {
         enabled: true,
         type: 'module',
@@ -61,15 +61,15 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: '/favicon.png',
+            sizes: '512x512',
+            type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: '/favicon.png',
+            sizes: '512x512',
+            type: 'image/png',
             purpose: 'maskable',
           },
         ],

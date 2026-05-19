@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ChevronRight, Lock, MapPin, ShieldCheck, Store, Truck } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa6'
 import { useCart } from '../context/CartContext'
 import { createOrder, generateOrderId } from '../lib/orders'
 import { isSupabaseConfigured } from '../lib/supabase'
 import { isPaystackConfigured, openPaystack } from '../lib/paystack'
+import { sendOrderToWhatsApp } from '../lib/whatsapp'
 
 const SHIPPING_THRESHOLD = 40000
 const SHIPPING_COST = 2500
@@ -22,9 +24,25 @@ export const PICKUP_ADDRESS = {
 function CheckoutPage() {
   const { items, count, subtotal, clearCart } = useCart()
   const navigate = useNavigate()
+  const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
+
+  const handleWhatsApp = () => {
+    const fd = formRef.current ? new FormData(formRef.current) : null
+    const name = fd
+      ? `${fd.get('firstName') ?? ''} ${fd.get('lastName') ?? ''}`.trim()
+      : ''
+    sendOrderToWhatsApp({
+      items,
+      subtotal,
+      shipping,
+      total,
+      deliveryMethod,
+      customer: { name, phone: fd?.get('phone') ?? '' },
+    })
+  }
 
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
 
@@ -144,7 +162,7 @@ function CheckoutPage() {
           Checkout
         </h1>
 
-        <form onSubmit={handleSubmit} className="mt-8 grid gap-8 lg:grid-cols-3">
+        <form ref={formRef} onSubmit={handleSubmit} className="mt-8 grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
             <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <legend className="px-2 text-sm font-semibold text-slate-900">Contact</legend>
@@ -302,6 +320,24 @@ function CheckoutPage() {
               >
                 {submitting ? 'Processing…' : `Pay ₦${total.toLocaleString('en-NG')} with Paystack`}
               </button>
+
+              <div className="my-3 flex items-center gap-3 text-xs text-slate-400">
+                <span className="h-px flex-1 bg-slate-200" />
+                or
+                <span className="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleWhatsApp}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+              >
+                <FaWhatsapp className="h-4 w-4" />
+                Order on WhatsApp
+              </button>
+              <p className="mt-2 text-center text-xs text-slate-500">
+                Send your order to us and pay on delivery or by transfer.
+              </p>
             </div>
           </aside>
         </form>
