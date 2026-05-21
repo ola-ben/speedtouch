@@ -81,9 +81,11 @@ function ProductDetailPage() {
                 alt={product.name}
                 className="h-full w-full object-cover"
               />
-              <span className="absolute right-4 top-4 rounded bg-brand-pink-soft px-2 py-1 text-xs font-bold text-brand-pink-deep">
-                -{product.discount}%
-              </span>
+              {product.discount > 0 && (
+                <span className="absolute right-4 top-4 rounded bg-brand-pink-soft px-2 py-1 text-xs font-bold text-brand-pink-deep">
+                  -{product.discount}%
+                </span>
+              )}
             </div>
           </div>
 
@@ -113,12 +115,16 @@ function ProductDetailPage() {
               <span className="text-3xl font-bold text-slate-900 md:text-4xl">
                 ₦{product.price.toLocaleString('en-NG')}
               </span>
-              <span className="text-base text-slate-400 line-through">
-                ₦{product.original.toLocaleString('en-NG')}
-              </span>
-              <span className="rounded bg-brand-pink-soft px-2 py-0.5 text-xs font-bold text-brand-pink-deep">
-                Save ₦{(product.original - product.price).toLocaleString('en-NG')}
-              </span>
+              {product.original && product.original > product.price && (
+                <>
+                  <span className="text-base text-slate-400 line-through">
+                    ₦{product.original.toLocaleString('en-NG')}
+                  </span>
+                  <span className="rounded bg-brand-pink-soft px-2 py-0.5 text-xs font-bold text-brand-pink-deep">
+                    Save ₦{(product.original - product.price).toLocaleString('en-NG')}
+                  </span>
+                </>
+              )}
             </div>
 
             <p className="mt-6 text-sm leading-relaxed text-slate-600 md:text-base">

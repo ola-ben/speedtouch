@@ -5,6 +5,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Transpile down so smart-TV browsers (older Chromium / WebKit) don't crash
+  // on syntax like ?. and ??.
+  build: {
+    target: 'es2018',
+    cssTarget: 'chrome70',
+  },
   plugins: [
     react(),
     tailwindcss(),

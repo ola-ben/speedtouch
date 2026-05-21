@@ -119,6 +119,13 @@ function AdminProductFormPage() {
       setSubmitting(false)
       return
     }
+    if (payload.original != null && payload.original < payload.price) {
+      setError(
+        'Original price must be higher than the current price (it\'s the strikethrough / pre-discount value). Leave it blank if there\'s no discount.',
+      )
+      setSubmitting(false)
+      return
+    }
 
     try {
       if (isEdit) await updateProduct(paramId, payload)
@@ -232,7 +239,10 @@ function AdminProductFormPage() {
                 className={inputClass}
               />
             </Field>
-            <Field label="Original price (₦)" hint="Optional. Used for strikethrough.">
+            <Field
+              label="Original price (₦)"
+              hint="Optional. Pre-discount price for the strikethrough. Must be higher than Price."
+            >
               <input
                 type="number"
                 min="0"

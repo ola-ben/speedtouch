@@ -9,15 +9,18 @@ const naira = (n) => `₦${Number(n).toLocaleString('en-NG')}`
  * Build a readable order/quotation message from the cart.
  */
 export function buildOrderMessage({
+  orderId,
   items,
   subtotal,
   shipping,
   total,
   deliveryMethod,
   customer,
+  shippingAddress,
 }) {
   const lines = []
   lines.push('*New order — Speedtouch*')
+  if (orderId) lines.push(`Order ID: *#${orderId}*`)
   lines.push('')
   lines.push('*Items*')
   items.forEach((it, i) => {
@@ -33,14 +36,31 @@ export function buildOrderMessage({
     }`,
   )
   lines.push(`*Total: ${naira(total)}*`)
-  if (deliveryMethod) {
-    lines.push('')
-    lines.push(
-      `Delivery: ${deliveryMethod === 'pickup' ? 'Pick up at station' : 'Home delivery'}`,
-    )
-  }
+
+  lines.push('')
+  lines.push('*Customer*')
   if (customer?.name) lines.push(`Name: ${customer.name}`)
+  if (customer?.email) lines.push(`Email: ${customer.email}`)
   if (customer?.phone) lines.push(`Phone: ${customer.phone}`)
+
+  lines.push('')
+  if (deliveryMethod === 'pickup') {
+    lines.push('*Delivery method*')
+    lines.push('Pick up at station (Speedtouch — Bodija)')
+  } else {
+    lines.push('*Shipping address*')
+    lines.push('Home delivery')
+    if (shippingAddress) {
+      if (shippingAddress.line1) lines.push(shippingAddress.line1)
+      const cityState = [shippingAddress.city, shippingAddress.state]
+        .filter(Boolean)
+        .join(', ')
+      if (cityState) lines.push(cityState)
+      if (shippingAddress.postal) lines.push(`Postal: ${shippingAddress.postal}`)
+      if (shippingAddress.country) lines.push(shippingAddress.country)
+    }
+  }
+
   lines.push('')
   lines.push('Please confirm availability and payment options. Thank you!')
   return lines.join('\n')

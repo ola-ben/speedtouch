@@ -186,11 +186,11 @@ function ProductsPage() {
                       <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur">
                         Sold out
                       </span>
-                    ) : (
+                    ) : p.discount > 0 ? (
                       <span className="absolute right-1.5 top-1.5 rounded bg-brand-pink-soft px-1.5 py-0.5 text-[10px] font-bold text-brand-pink-deep">
                         -{p.discount}%
                       </span>
-                    )}
+                    ) : null}
                   </div>
                   <div className="px-3 pt-3">
                     <h3 className="line-clamp-2 min-h-[2.4em] text-xs leading-snug text-slate-800 md:text-sm">
@@ -199,9 +199,11 @@ function ProductsPage() {
                     <div className="mt-1 text-sm font-bold text-slate-900 md:text-base">
                       ₦{p.price.toLocaleString('en-NG')}
                     </div>
-                    <div className="text-[10px] text-slate-400 line-through md:text-xs">
-                      ₦{p.original.toLocaleString('en-NG')}
-                    </div>
+                    {p.original ? (
+                      <div className="text-[10px] text-slate-400 line-through md:text-xs">
+                        ₦{p.original.toLocaleString('en-NG')}
+                      </div>
+                    ) : null}
                     <StockBar stock={p.stock} />
                   </div>
                 </Link>

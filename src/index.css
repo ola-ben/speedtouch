@@ -24,6 +24,35 @@
 
 html {
   scroll-behavior: smooth;
+  /* Allow content to fill very wide screens (Full HD, 4K, smart-TV browsers).
+     Every rem-based size in the design scales with this. */
+  font-size: 16px;
+}
+
+/* Full HD viewports — common TV / large monitor */
+@media (min-width: 1600px) {
+  html {
+    font-size: 17px;
+  }
+}
+@media (min-width: 1920px) {
+  html {
+    font-size: 18px;
+  }
+}
+/* 4K and ultra-wide */
+@media (min-width: 2560px) {
+  html {
+    font-size: 20px;
+  }
+}
+
+/* On big screens, widen the standard content container so it doesn't feel
+   marooned in the middle of the screen. */
+@media (min-width: 1600px) {
+  .max-w-6xl {
+    max-width: 88rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -96,6 +96,7 @@ export function CartProvider({ children }) {
     count,
     subtotal,
     addItem,
+    showToast,
     removeItem,
     setQuantity,
     clearCart,

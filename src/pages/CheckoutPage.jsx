@@ -5,8 +5,7 @@ import { FaWhatsapp } from 'react-icons/fa6'
 import { useCart } from '../context/CartContext'
 import { createOrder, generateOrderId } from '../lib/orders'
 import { isSupabaseConfigured } from '../lib/supabase'
-import { isPaystackConfigured, openPaystack } from '../lib/paystack'
-import { sendOrderToWhatsApp } from '../lib/whatsapp'
+import { buildOrderMessage, WHATSAPP_NUMBER } from '../lib/whatsapp'
 
 const SHIPPING_THRESHOLD = 40000
 const SHIPPING_COST = 2500
@@ -22,27 +21,12 @@ export const PICKUP_ADDRESS = {
 }
 
 function CheckoutPage() {
-  const { items, count, subtotal, clearCart } = useCart()
+  const { items, count, subtotal, clearCart, showToast } = useCart()
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
-
-  const handleWhatsApp = () => {
-    const fd = formRef.current ? new FormData(formRef.current) : null
-    const name = fd
-      ? `${fd.get('firstName') ?? ''} ${fd.get('lastName') ?? ''}`.trim()
-      : ''
-    sendOrderToWhatsApp({
-      items,
-      subtotal,
-      shipping,
-      total,
-      deliveryMethod,
-      customer: { name, phone: fd?.get('phone') ?? '' },
-    })
-  }
 
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
 
@@ -50,11 +34,21 @@ function CheckoutPage() {
   const shipping = isPickup ? 0 : subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
   const total = subtotal + shipping
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
+  // Paystack is staged for later. For now we route everyone through WhatsApp.
+  const handlePaystackClick = () => {
+    showToast(
+      'Paystack coming soon — please order on WhatsApp, our team will attend to you instantly.',
+    )
+  }
 
-    const fd = new FormData(e.currentTarget)
+  const handleWhatsApp = async () => {
+    // Make sure the form's required fields are filled before placing an order.
+    if (formRef.current && !formRef.current.reportValidity()) return
+
+    setError(null)
+    setSubmitting(true)
+
+    const fd = new FormData(formRef.current)
     const customerEmail = fd.get('email')
     const customerPhone = fd.get('phone')
     const customerName =
@@ -71,7 +65,8 @@ function CheckoutPage() {
           country: fd.get('country') ?? 'Nigeria',
         }
 
-    const finishOrder = async (paymentReference, status) => {
+    // 1. Write the order to Supabase first so admin sees it immediately.
+    try {
       if (isSupabaseConfigured) {
         await createOrder({
           id: orderId,
@@ -80,12 +75,12 @@ function CheckoutPage() {
           customerPhone,
           deliveryMethod,
           shippingAddress,
-          paymentMethod: 'paystack',
-          paymentReference: paymentReference ?? null,
+          paymentMethod: 'whatsapp',
+          paymentReference: null,
           subtotal,
           shipping,
           total,
-          status,
+          status: 'pending',
           items: items.map((it) => ({
             productId: it.id,
             name: it.name,
@@ -95,56 +90,41 @@ function CheckoutPage() {
           })),
         })
       }
-      clearCart()
-      navigate(
-        `/order/confirmation?id=${orderId}&method=${deliveryMethod}`,
-        { replace: true },
-      )
-    }
-
-    setSubmitting(true)
-
-    if (!isPaystackConfigured) {
-      // No Paystack key — fall back to a soft demo flow so checkout still works
-      // in environments without the env var (e.g., a fresh fork).
-      try {
-        await new Promise((res) => setTimeout(res, 600))
-        await finishOrder(null, 'pending')
-      } catch (err) {
-        setError(err.message || 'Failed to place order')
-        setSubmitting(false)
-      }
+    } catch (err) {
+      setError(err.message || 'Could not save the order. Please try again.')
+      setSubmitting(false)
       return
     }
 
-    try {
-      const response = await openPaystack({
-        email: customerEmail,
-        amount: total,
-        reference: orderId,
-        metadata: {
-          orderId,
-          customerName,
-          customerPhone,
-          deliveryMethod,
-          custom_fields: [
-            {
-              display_name: 'Order ID',
-              variable_name: 'order_id',
-              value: orderId,
-            },
-          ],
+    // 2. Open WhatsApp with a message that quotes the order ID for matching.
+    const message = encodeURIComponent(
+      buildOrderMessage({
+        orderId,
+        items,
+        subtotal,
+        shipping,
+        total,
+        deliveryMethod,
+        customer: {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
         },
-      })
-      await finishOrder(response.reference ?? orderId, 'paid')
-    } catch (err) {
-      if (err && err.cancelled) {
-        setError('Payment cancelled. You can try again.')
-      } else {
-        setError(err.message || 'Payment failed. Please try again.')
-      }
-      setSubmitting(false)
-    }
+        shippingAddress,
+      }),
+    )
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`,
+      '_blank',
+      'noopener,noreferrer',
+    )
+
+    // 3. Clear cart and send the customer to a confirmation page.
+    clearCart()
+    navigate(
+      `/order/confirmation?id=${orderId}&method=${deliveryMethod}`,
+      { replace: true },
+    )
   }
 
   return (
@@ -162,7 +142,14 @@ function CheckoutPage() {
           Checkout
         </h1>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="mt-8 grid gap-8 lg:grid-cols-3">
+        <form
+          ref={formRef}
+          onSubmit={(e) => {
+            e.preventDefault()
+            handlePaystackClick()
+          }}
+          className="mt-8 grid gap-8 lg:grid-cols-3"
+        >
           <div className="space-y-8 lg:col-span-2">
             <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <legend className="px-2 text-sm font-semibold text-slate-900">Contact</legend>
@@ -314,11 +301,16 @@ function CheckoutPage() {
                 </p>
               )}
               <button
-                type="submit"
-                disabled={submitting}
-                className="mt-5 w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-60"
+                type="button"
+                onClick={handlePaystackClick}
+                aria-disabled="true"
+                title="Paystack coming soon — order on WhatsApp instead"
+                className="mt-5 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-slate-300 px-5 py-3 text-sm font-semibold text-slate-500 shadow-sm transition hover:bg-slate-300"
               >
-                {submitting ? 'Processing…' : `Pay ₦${total.toLocaleString('en-NG')} with Paystack`}
+                Pay ₦{total.toLocaleString('en-NG')} with Paystack
+                <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Soon
+                </span>
               </button>
 
               <div className="my-3 flex items-center gap-3 text-xs text-slate-400">
@@ -330,13 +322,14 @@ function CheckoutPage() {
               <button
                 type="button"
                 onClick={handleWhatsApp}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                disabled={submitting}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:opacity-60"
               >
-                <FaWhatsapp className="h-4 w-4" />
-                Order on WhatsApp
+                <FaWhatsapp className="h-5 w-5" />
+                {submitting ? 'Placing order…' : 'Order on WhatsApp'}
               </button>
               <p className="mt-2 text-center text-xs text-slate-500">
-                Send your order to us and pay on delivery or by transfer.
+                Our customer care will attend to you instantly.
               </p>
             </div>
           </aside>
