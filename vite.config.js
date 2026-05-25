@@ -52,6 +52,27 @@ export default defineConfig({
               expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
+          {
+            // Supabase REST reads for the public catalogue (products, services,
+            // approved reviews). Show cached data instantly then refresh in
+            // the background.
+            urlPattern: /^https:\/\/[a-z0-9]+\.supabase\.co\/rest\/v1\/(products|services|reviews)\b.*/i,
+            method: 'GET',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'supabase-catalogue',
+              expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            // Customer-uploaded product / service images on Supabase Storage.
+            urlPattern: /^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'supabase-storage-images',
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
         ],
       },
       manifest: {

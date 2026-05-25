@@ -90,7 +90,7 @@ function PricingPage() {
         <div className="mt-10 space-y-3 text-sm text-slate-700">
           <p>
             <strong>Travel:</strong> we cover Ibadan and most of Oyo within
-            10km of Bodija free of charge. Further afield, we'll add a small
+            10km of our Old Bolaji office free of charge. Further afield, we'll add a small
             transport fee — we'll always tell you before booking.
           </p>
           <p>

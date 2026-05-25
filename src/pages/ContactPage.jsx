@@ -7,7 +7,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle'
 function ContactPage() {
   useDocumentTitle(
     'Contact us',
-    "Reach Speedtouch — WhatsApp, phone, email, or visit our Bodija office in Ibadan.",
+    "Reach Speedtouch — WhatsApp, phone, email, or visit our Old Bolaji office in Ibadan.",
   )
 
   return (
@@ -67,8 +67,8 @@ function ContactPage() {
           <ContactCard
             icon={MapPin}
             title="Visit"
-            line1="7 Oluyoro St, off Awolowo Avenue"
-            line2="Old Bodija, Lagelu · Ibadan, Oyo"
+            line1="7 Oluyoro Street, off Awolowo Avenue"
+            line2="Old Bolaji · Ibadan, Oyo"
           />
           <ContactCard
             icon={Clock}

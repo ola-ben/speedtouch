@@ -11,9 +11,9 @@ const SHIPPING_THRESHOLD = 40000
 const SHIPPING_COST = 2500
 
 export const PICKUP_ADDRESS = {
-  street: '7 Oluyoro St, off Awolowo Avenue',
-  area: 'Old Bodija',
-  city: 'Lagelu',
+  street: '7 Oluyoro Street, off Awolowo Avenue',
+  area: 'Old Bolaji',
+  city: 'Ibadan',
   postal: '000234',
   state: 'Oyo',
   country: 'Nigeria',
@@ -174,7 +174,7 @@ function CheckoutPage() {
                 <DeliveryOption
                   icon={Store}
                   title="Pick up at station"
-                  body="Free · pick up from our Bodija store"
+                  body="Free · pick up from our Old Bolaji store"
                   selected={isPickup}
                   onClick={() => setDeliveryMethod('pickup')}
                 />
@@ -207,7 +207,7 @@ function CheckoutPage() {
                   <div className="flex items-start gap-3">
                     <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
                     <div className="text-sm">
-                      <div className="font-semibold text-slate-900">Speedtouch — Bodija</div>
+                      <div className="font-semibold text-slate-900">Speedtouch — Old Bolaji</div>
                       <div className="mt-1 text-slate-700">
                         {PICKUP_ADDRESS.street}<br />
                         {PICKUP_ADDRESS.area}, {PICKUP_ADDRESS.city} {PICKUP_ADDRESS.postal}<br />

@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Mail, Truck, Store, MapPin } from 'lucide-react'
+import { CheckCircle2, Mail, Truck, Store, MapPin, PenSquare } from 'lucide-react'
 import { PICKUP_ADDRESS } from './CheckoutPage'
 
 function OrderConfirmationPage() {
@@ -60,7 +60,7 @@ function OrderConfirmationPage() {
             <div className="flex items-start gap-3">
               <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
               <div className="text-sm">
-                <div className="font-semibold text-slate-900">Speedtouch — Bodija</div>
+                <div className="font-semibold text-slate-900">Speedtouch — Old Bolaji</div>
                 <div className="mt-1 text-slate-700">
                   {PICKUP_ADDRESS.street}<br />
                   {PICKUP_ADDRESS.area}, {PICKUP_ADDRESS.city} {PICKUP_ADDRESS.postal}<br />
@@ -87,6 +87,31 @@ function OrderConfirmationPage() {
           >
             Back to home
           </Link>
+        </div>
+
+        <div className="mt-12 rounded-3xl bg-linear-to-br from-brand-blue-soft via-white to-brand-pink-soft p-6 text-left sm:p-8">
+          <div className="flex items-start gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-blue text-white">
+              <PenSquare className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold text-slate-900 sm:text-lg">
+                After we're done, will you tell us how it went?
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Save this page or bookmark <Link to="/reviews" className="font-medium text-brand-blue hover:underline">/reviews</Link>.
+                A 30-second review helps the next customer decide — and helps us
+                catch anything we should fix.
+              </p>
+              <Link
+                to="/reviews"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              >
+                <PenSquare className="h-4 w-4" />
+                Leave a review
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

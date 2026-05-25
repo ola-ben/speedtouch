@@ -169,6 +169,12 @@ function CartPage() {
                 <p className="mt-3 text-center text-xs text-slate-500">
                   Secure SSL checkout · Multiple payment methods
                 </p>
+                <p className="mt-4 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
+                  Worked with us before?{' '}
+                  <Link to="/reviews" className="font-medium text-brand-blue hover:underline">
+                    Leave a review →
+                  </Link>
+                </p>
               </div>
             </aside>
           </div>

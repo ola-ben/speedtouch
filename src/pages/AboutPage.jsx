@@ -61,7 +61,7 @@ function AboutPage() {
 
         <div className="mt-12 rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center">
           <p className="text-sm text-slate-700">
-            We're based at <strong>7 Oluyoro St, Old Bodija, Ibadan</strong>.
+            We're based at <strong>7 Oluyoro Street, off Awolowo Avenue, Old Bolaji, Ibadan</strong>.
             Stop by, or just send us a message — we read everything.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">

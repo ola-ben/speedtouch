@@ -1,9 +1,36 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronRight, Mail, Phone, MapPin, CreditCard, Store, Truck } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa6'
 import { STATUS_META } from '../../data/orders'
 import { ORDER_STATUSES, updateOrderStatus } from '../../lib/orders'
 import { useOrder } from '../../hooks/useOrders'
+
+const REVIEW_URL = 'https://speedtouch-virid.vercel.app/reviews'
+
+function normalizeNgPhone(raw) {
+  if (!raw) return ''
+  const digits = String(raw).replace(/\D/g, '')
+  if (digits.startsWith('234')) return digits
+  if (digits.startsWith('0') && digits.length === 11) return '234' + digits.slice(1)
+  if (digits.length === 10) return '234' + digits
+  return digits
+}
+
+function buildReviewRequest(order) {
+  const firstName = (order.customerName || '').trim().split(/\s+/)[0] || 'there'
+  return [
+    `Hi ${firstName} — thanks for choosing Speedtouch! 🙌`,
+    `Your order #${order.id} is complete.`,
+    '',
+    `If you have 30 seconds, we'd really appreciate an honest review:`,
+    REVIEW_URL,
+    '',
+    `It helps the next customer decide — and helps us catch anything we should fix.`,
+    '',
+    `— Speedtouch Cleanings and Hygiene`,
+  ].join('\n')
+}
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`
@@ -108,6 +135,18 @@ function AdminOrderDetailPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {order.customerPhone && (
+              <a
+                href={`https://wa.me/${normalizeNgPhone(order.customerPhone)}?text=${encodeURIComponent(buildReviewRequest(order))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open WhatsApp with a review request pre-filled"
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              >
+                <FaWhatsapp className="h-4 w-4" />
+                Request review
+              </a>
+            )}
             <label className="text-xs font-medium text-slate-600">Status</label>
             <select
               value={order.status}
@@ -259,9 +298,9 @@ function AdminOrderDetailPage() {
                     <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
                     {isPickup ? (
                       <div>
-                        <div className="font-medium text-slate-900">Speedtouch — Bodija</div>
-                        <div>7 Oluyoro St, off Awolowo Avenue</div>
-                        <div>Old Bodija, Lagelu 000234</div>
+                        <div className="font-medium text-slate-900">Speedtouch — Old Bolaji</div>
+                        <div>7 Oluyoro Street, off Awolowo Avenue</div>
+                        <div>Old Bolaji · Ibadan 000234</div>
                         <div>Oyo, Nigeria</div>
                       </div>
                     ) : addr ? (
