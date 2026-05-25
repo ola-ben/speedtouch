@@ -2,6 +2,15 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import { useServices } from '../hooks/useServices'
+import { WHATSAPP_NUMBER } from '../lib/whatsapp'
+
+const bookingLink = (service) => {
+  const price = `₦${Number(service.price).toLocaleString('en-NG')}`
+  const text = encodeURIComponent(
+    `Hi Speedtouch — I'd like to book the *${service.name}* (${price}, negotiable). Could we discuss?`,
+  )
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
+}
 
 function Services() {
   const containerRef = useRef(null)
@@ -136,9 +145,14 @@ function Services() {
                               </span>
                             )}
                           </div>
+                          <span className="mt-1 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                            Negotiable
+                          </span>
                         </div>
                         <a
-                          href="#book"
+                          href={bookingLink(s)}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="rounded-full bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                         >
                           Book
@@ -152,8 +166,15 @@ function Services() {
 
             <p className="mt-10 text-center text-sm text-slate-500">
               Need something custom?{' '}
-              <a href="#contact" className="font-medium text-brand-blue hover:underline">
-                Get a tailored quote →
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                  "Hi Speedtouch — I'd like a tailored cleaning quote. ",
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-brand-blue hover:underline"
+              >
+                Get a tailored quote on WhatsApp →
               </a>
             </p>
           </>

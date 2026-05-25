@@ -1,7 +1,24 @@
+import { useState } from 'react'
 import { ShieldCheck, Leaf, Sparkles } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa6'
 import Reveal from './Reveal'
+import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 
 function Co() {
+  const [details, setDetails] = useState('')
+
+  const handleQuote = (e) => {
+    e.preventDefault()
+    const intro = "Hi Speedtouch — I'd like a free cleaning quote."
+    const body = details.trim() ? `\n\nAbout my space:\n${details.trim()}` : ''
+    const text = encodeURIComponent(`${intro}${body}`)
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`,
+      '_blank',
+      'noopener,noreferrer',
+    )
+  }
+
   const features = [
     {
       title: 'Trained & insured',
@@ -70,24 +87,27 @@ function Co() {
                 Get a free quote in 60 seconds
               </h3>
               <p className="mt-3 text-slate-600">
-                Tell us about your space and we'll send you an instant price —
-                with 20% off your first clean. No commitment, no calls.
+                Tell us about your space on WhatsApp and we'll send you a
+                quote — with 20% off your first clean. No commitment, no
+                calls.
               </p>
             </div>
             <form
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleQuote}
               className="flex flex-col gap-3 sm:flex-row"
             >
               <input
-                type="email"
-                required
-                placeholder="you@email.com"
+                type="text"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="e.g. 3-bed flat in Bodija"
                 className="flex-1 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
               />
               <button
                 type="submit"
-                className="rounded-full bg-brand-blue px-6 py-3 text-sm font-medium text-white shadow-md transition hover:bg-blue-700"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-md transition hover:bg-emerald-700"
               >
+                <FaWhatsapp className="h-4 w-4" />
                 Get my quote
               </button>
             </form>
