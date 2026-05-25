@@ -1,71 +1,70 @@
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Star, Quote } from 'lucide-react'
+import { ChevronRight, Star, Quote, PenSquare } from 'lucide-react'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
+import { useApprovedReviews } from '../hooks/useReviews'
+import ReviewForm from '../components/ReviewForm'
 
-const reviews = [
+const seedReviews = [
   {
+    id: 'seed-1',
     name: 'Adaeze O.',
-    where: 'Lekki, Lagos',
+    location: 'Lekki, Lagos',
     rating: 5,
-    quote:
+    comment:
       "They came at 9am exactly. Stayed for the full three hours. I came back to a kitchen I haven't seen since 2022.",
     service: 'Deep Clean',
-    avatar: 'https://i.pravatar.cc/120?img=47',
+    seed: true,
   },
   {
+    id: 'seed-2',
     name: 'Chinedu E.',
-    where: 'Asokoro, Abuja',
+    location: 'Asokoro, Abuja',
     rating: 5,
-    quote:
-      "Booked them for a move-out clean. My landlord called the next day to ask which company we used. I gave him this site.",
+    comment:
+      'Booked them for a move-out clean. My landlord called the next day to ask which company we used. I gave him this site.',
     service: 'Move In / Out',
-    avatar: 'https://i.pravatar.cc/120?img=12',
+    seed: true,
   },
   {
+    id: 'seed-3',
     name: 'Folake A.',
-    where: 'Bodija, Ibadan',
+    location: 'Bodija, Ibadan',
     rating: 5,
-    quote:
-      'Same lady every week. She knows my Saturday is for sleep — I come downstairs to a sparkling kitchen and that\'s the start of the weekend.',
+    comment:
+      "Same lady every week. She knows my Saturday is for sleep — I come downstairs to a sparkling kitchen and that's the start of the weekend.",
     service: 'Weekly Standard Clean',
-    avatar: 'https://i.pravatar.cc/120?img=32',
-  },
-  {
-    name: 'Tunde B.',
-    where: 'GRA, Port Harcourt',
-    rating: 4,
-    quote:
-      "Solid job. They missed a spot under the bed the first time and came back to fix it the next day — at no extra cost. That's how you keep a customer.",
-    service: 'Standard Clean',
-    avatar: 'https://i.pravatar.cc/120?img=8',
-  },
-  {
-    name: 'Ngozi I.',
-    where: 'Ikoyi, Lagos',
-    rating: 5,
-    quote:
-      "I have two cats. They didn't flinch. Used the eco products without me asking — and the place smelled like nothing, which is exactly what I wanted.",
-    service: 'Deep Clean',
-    avatar: 'https://i.pravatar.cc/120?img=44',
-  },
-  {
-    name: 'Bisi O.',
-    where: 'Ikeja, Lagos',
-    rating: 5,
-    quote:
-      "Our office (about 18 desks) gets done after hours twice a week. Smooth and quiet — staff barely notice they were here, except every Monday everything works.",
-    service: 'Office Clean',
-    avatar: 'https://i.pravatar.cc/120?img=23',
+    seed: true,
   },
 ]
+
+const AVATAR_POOL = [47, 12, 32, 8, 44, 23, 20, 15, 5, 33, 16, 25]
+
+function avatarFor(name) {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0
+  const id = AVATAR_POOL[Math.abs(hash) % AVATAR_POOL.length]
+  return `https://i.pravatar.cc/120?img=${id}`
+}
 
 function ReviewsPage() {
   useDocumentTitle(
     'Reviews',
     "What customers say about Speedtouch's cleaning services in Ibadan, Lagos, Abuja and beyond.",
   )
+  const { reviews: live, loading, refresh } = useApprovedReviews()
+  const [formOpen, setFormOpen] = useState(false)
 
-  const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+  const combined = useMemo(() => {
+    // Always lead with real customer reviews; pad with seed examples until at
+    // least 3 are visible so the page doesn't feel empty.
+    if (live.length >= 3) return live
+    return [...live, ...seedReviews.slice(0, 3 - live.length)]
+  }, [live])
+
+  const ratingPool = live.length > 0 ? live : seedReviews
+  const avg =
+    ratingPool.reduce((s, r) => s + r.rating, 0) / Math.max(1, ratingPool.length)
 
   return (
     <section className="bg-white py-12 md:py-20">
@@ -104,60 +103,93 @@ function ReviewsPage() {
               {avg.toFixed(1)}
             </div>
             <div className="text-xs text-slate-500">
-              from {reviews.length} reviews
+              from {ratingPool.length} review{ratingPool.length === 1 ? '' : 's'}
             </div>
           </div>
         </div>
 
-        <ul className="mt-10 grid gap-5 md:grid-cols-2">
-          {reviews.map((r, i) => (
-            <li
-              key={i}
-              className="relative rounded-2xl border border-slate-100 bg-white p-6"
-            >
-              <Quote className="absolute right-5 top-5 h-6 w-6 text-brand-pink/60" />
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className={`h-4 w-4 ${
-                      s <= r.rating
-                        ? 'fill-amber-400 text-amber-400'
-                        : 'text-slate-300'
-                    }`}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-5">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">
+              Recently used us?
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Drop a few honest lines — it helps the next person decide.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFormOpen(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            <PenSquare className="h-4 w-4" />
+            Leave a review
+          </button>
+        </div>
+
+        {loading && live.length === 0 ? (
+          <div className="mt-10 flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-blue/20 border-t-brand-blue" />
+          </div>
+        ) : (
+          <ul className="mt-8 grid gap-5 md:grid-cols-2">
+            {combined.map((r) => (
+              <li
+                key={r.id}
+                className="relative rounded-2xl border border-slate-100 bg-white p-6"
+              >
+                <Quote className="absolute right-5 top-5 h-6 w-6 text-brand-pink/60" />
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      className={`h-4 w-4 ${
+                        s <= r.rating
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'text-slate-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700">
+                  "{r.comment}"
+                </p>
+                <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-4">
+                  <img
+                    src={avatarFor(r.name)}
+                    alt=""
+                    className="h-10 w-10 rounded-full object-cover"
+                    loading="lazy"
                   />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">
-                "{r.quote}"
-              </p>
-              <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-4">
-                <img
-                  src={r.avatar}
-                  alt=""
-                  className="h-10 w-10 rounded-full object-cover"
-                  loading="lazy"
-                />
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-slate-900">
-                    {r.name}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {r.where} · {r.service}
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-slate-900">
+                      {r.name}
+                    </div>
+                    <div className="truncate text-xs text-slate-500">
+                      {[r.location, r.service].filter(Boolean).join(' · ')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="mt-12 rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center text-sm text-slate-700">
-          Just booked us?{' '}
+          Want to chat with us directly?{' '}
           <Link to="/contact" className="font-medium text-brand-blue hover:underline">
-            Tell us how it went →
+            Get in touch →
           </Link>
         </div>
       </div>
+
+      <ReviewForm
+        open={formOpen}
+        onClose={() => {
+          setFormOpen(false)
+          refresh()
+        }}
+      />
     </section>
   )
 }
