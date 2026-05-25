@@ -7,13 +7,21 @@ const socials = [
     Icon: FaInstagram,
     label: 'Instagram',
     href: 'https://www.instagram.com/speedtouch_cleanings/',
+    hoverClass:
+      'hover:bg-[linear-gradient(45deg,#feda75,#fa7e1e_25%,#d62976_50%,#962fbf_75%,#4f5bd5)] hover:text-white hover:border-transparent',
   },
   {
     Icon: FaFacebookF,
     label: 'Facebook',
     href: 'https://www.facebook.com/speedtouchcleaners/',
+    hoverClass: 'hover:bg-[#1877f2] hover:text-white',
   },
-  { Icon: FaTiktok, label: 'TikTok', href: '#' },
+  {
+    Icon: FaTiktok,
+    label: 'TikTok',
+    href: 'https://vm.tiktok.com/ZS9YsDbx9upyt-6se0M/',
+    hoverClass: 'hover:bg-black hover:text-white',
+  },
 ]
 
 const cols = [
@@ -59,14 +67,14 @@ function Footer() {
             </p>
 
             <div className="mt-5 flex items-center gap-2">
-              {socials.map(({ Icon, label, href }) => (
+              {socials.map(({ Icon, label, href, hoverClass }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm transition hover:bg-brand-blue hover:text-white"
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm transition ${hoverClass}`}
                 >
                   <Icon className="h-4 w-4" />
                 </a>
