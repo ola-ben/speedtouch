@@ -1,29 +1,52 @@
-import { FaInstagram, FaFacebookF, FaTiktok, FaXTwitter } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+import { FaInstagram, FaFacebookF, FaTiktok } from 'react-icons/fa6'
 import Logo from './Logo'
 
 const socials = [
-  { Icon: FaInstagram, label: 'Instagram', href: '#' },
-  { Icon: FaFacebookF, label: 'Facebook', href: '#' },
+  {
+    Icon: FaInstagram,
+    label: 'Instagram',
+    href: 'https://www.instagram.com/speedtouch_cleanings/',
+  },
+  {
+    Icon: FaFacebookF,
+    label: 'Facebook',
+    href: 'https://www.facebook.com/speedtouchcleaners/',
+  },
   { Icon: FaTiktok, label: 'TikTok', href: '#' },
-  { Icon: FaXTwitter, label: 'X (Twitter)', href: '#' },
+]
+
+const cols = [
+  {
+    title: 'Services',
+    links: [
+      { label: 'Standard cleaning', to: '/#services' },
+      { label: 'Deep cleaning', to: '/#services' },
+      { label: 'Move in / out', to: '/#services' },
+      { label: 'Office & commercial', to: '/#services' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About us', to: '/about' },
+      { label: 'Our cleaners', to: '/cleaners' },
+      { label: 'Careers', to: '/careers' },
+      { label: 'Reviews', to: '/reviews' },
+    ],
+  },
+  {
+    title: 'Help',
+    links: [
+      { label: 'Contact', to: '/contact' },
+      { label: 'Pricing', to: '/pricing' },
+      { label: 'Cancellation', to: '/cancellation' },
+      { label: 'FAQ', to: '/faq' },
+    ],
+  },
 ]
 
 function Footer() {
-  const cols = [
-    {
-      title: 'Services',
-      links: ['Standard cleaning', 'Deep cleaning', 'Move in / out', 'Office & commercial'],
-    },
-    {
-      title: 'Company',
-      links: ['About us', 'Our cleaners', 'Careers', 'Reviews'],
-    },
-    {
-      title: 'Help',
-      links: ['Contact', 'Pricing', 'Cancellation', 'FAQ'],
-    },
-  ]
-
   return (
     <footer id="contact" className="border-t border-slate-100 bg-brand-pink-soft">
       <div className="mx-auto max-w-6xl px-6 py-16">
@@ -40,6 +63,8 @@ function Footer() {
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm transition hover:bg-brand-blue hover:text-white"
                 >
@@ -54,13 +79,13 @@ function Footer() {
               <h4 className="text-sm font-semibold text-slate-900">{c.title}</h4>
               <ul className="mt-4 space-y-2.5">
                 {c.links.map((l) => (
-                  <li key={l}>
-                    <a
-                      href="#"
+                  <li key={`${c.title}-${l.label}`}>
+                    <Link
+                      to={l.to}
                       className="text-sm text-slate-600 transition hover:text-brand-blue"
                     >
-                      {l}
-                    </a>
+                      {l.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -69,11 +94,11 @@ function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-pink-200/60 pt-6 text-xs text-slate-500 md:flex-row">
-          <div>© 2026 Speedtouch Cleaning Services. All rights reserved.</div>
+          <div>© 2026 Speedtouch Cleanings and Hygiene Ltd. All rights reserved.</div>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-brand-blue">Privacy</a>
-            <a href="#" className="hover:text-brand-blue">Terms</a>
-            <a href="#" className="hover:text-brand-blue">Cookies</a>
+            <Link to="/privacy" className="hover:text-brand-blue">Privacy</Link>
+            <Link to="/terms" className="hover:text-brand-blue">Terms</Link>
+            <Link to="/contact" className="hover:text-brand-blue">Contact</Link>
           </div>
         </div>
       </div>

@@ -17,6 +17,14 @@ const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const CleanersPage = lazy(() => import('./pages/CleanersPage'))
+const CareersPage = lazy(() => import('./pages/CareersPage'))
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+const PricingPage = lazy(() => import('./pages/PricingPage'))
+const CancellationPage = lazy(() => import('./pages/CancellationPage'))
+const FAQPage = lazy(() => import('./pages/FAQPage'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'))
@@ -56,6 +64,15 @@ function Shell() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order/confirmation" element={<OrderConfirmationPage />} />
+
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/cleaners" element={<CleanersPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/cancellation" element={<CancellationPage />} />
+            <Route path="/faq" element={<FAQPage />} />
 
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
