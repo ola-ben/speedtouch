@@ -81,7 +81,7 @@ define(['./workbox-78c429e3'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.hcjbloqdqgg"
+    "revision": "0.ms679aht8nc"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
@@ -106,6 +106,20 @@ define(['./workbox-78c429e3'], (function (workbox) { 'use strict';
     "cacheName": "hero-video",
     plugins: [new workbox.RangeRequestsPlugin(), new workbox.ExpirationPlugin({
       maxEntries: 4,
+      maxAgeSeconds: 2592000
+    })]
+  }), 'GET');
+  workbox.registerRoute(/^https:\/\/[a-z0-9]+\.supabase\.co\/rest\/v1\/(products|services|reviews)\b.*/i, new workbox.StaleWhileRevalidate({
+    "cacheName": "supabase-catalogue",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 64,
+      maxAgeSeconds: 604800
+    })]
+  }), 'GET');
+  workbox.registerRoute(/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/.*/i, new workbox.StaleWhileRevalidate({
+    "cacheName": "supabase-storage-images",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 200,
       maxAgeSeconds: 2592000
     })]
   }), 'GET');
