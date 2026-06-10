@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopfront — Starter Template</title>
+
+  <!-- Tailwind Play CDN (no build step). For production, install Tailwind properly. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Inter for UI, Instrument Serif for the elegant italic accent -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+  <script>
+    // --- Design tokens (edit these to rebrand the whole site) ---
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand:  { 50:'#eef4ff', 100:'#d9e6ff', 500:'#2f6bff', 600:'#2256e6', 700:'#1b46c2' }, // royal blue (primary)
+            accent: { 50:'#fdf2f8', 500:'#e84a8a', 600:'#d83a7a' },                                // pink (eyebrows / highlights)
+            grass:  { 500:'#1fb46a', 600:'#179a59' },                                              // green (quote/CTA)
+            navy:   { 800:'#101626', 900:'#0a0f1c' },                                              // footer
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+          },
+          boxShadow: {
+            card: '0 1px 2px rgba(16,22,38,.04), 0 12px 32px -12px rgba(16,22,38,.12)',
+          },
+          borderRadius: { '2xl': '1.1rem', '3xl': '1.6rem' },
+        },
+      },
+    }
+  </script>
+  <style>
+    .em { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; }
+    .eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    /* marquee */
+    @keyframes marquee { to { transform: translateX(-50%); } }
+    .marquee { animation: marquee 22s linear infinite; }
+  </style>
+</head>
+
+<body class="bg-white font-sans text-slate-600 antialiased">
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="sticky top-0 z-40 border-b border-slate-100 bg-white/85 backdrop-blur">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
+      <a href="#" class="flex items-center gap-2 font-bold tracking-tight text-slate-900">
+        <span class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500 text-white">◆</span>
+        Shopfront
+      </a>
+      <ul class="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
+        <li><a class="hover:text-slate-900" href="#">Shop</a></li>
+        <li><a class="hover:text-slate-900" href="#products">New in</a></li>
+        <li><a class="hover:text-slate-900" href="#deals">Deals</a></li>
+        <li><a class="hover:text-slate-900" href="#why">About</a></li>
+        <li><a class="hover:text-slate-900" href="#contact">Contact</a></li>
+      </ul>
+      <div class="flex items-center gap-2.5">
+        <a href="#" class="hidden text-sm font-medium text-slate-600 hover:text-slate-900 sm:inline">Sign in</a>
+        <a href="#" class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600">
+          Cart · 2
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="mx-auto max-w-6xl px-5 pt-6">
+    <div class="relative overflow-hidden rounded-3xl">
+      <img src="https://picsum.photos/seed/herobg/1600/900" alt="" class="absolute inset-0 h-full w-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-b from-white/85 via-white/70 to-white/85"></div>
+
+      <div class="relative px-6 py-16 text-center sm:py-24">
+        <span class="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-grass-500"></span> Trusted by 5,000+ shoppers
+        </span>
+
+        <h1 class="mx-auto mt-5 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl">
+          Everything you love,<br />
+          <span class="em text-brand-600">without the wait</span>
+        </h1>
+        <p class="mx-auto mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
+          Quality products, honest prices, fast delivery. Shop in under a minute — we handle the rest.
+        </p>
+
+        <div class="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <a href="#products" class="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Start shopping</a>
+          <a href="#why" class="rounded-full px-6 py-3 text-sm font-semibold text-slate-700 underline-offset-4 hover:underline">How it works →</a>
+        </div>
+
+        <div class="mt-8 flex items-center justify-center gap-3 text-sm text-slate-600">
+          <div class="flex -space-x-2">
+            <img class="h-8 w-8 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/64?img=12" alt="" />
+            <img class="h-8 w-8 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/64?img=32" alt="" />
+            <img class="h-8 w-8 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/64?img=45" alt="" />
+          </div>
+          <span><b class="text-slate-900">5,000+</b> happy customers · 4.8/5 ★★★★★</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TICKER BAR ============ -->
+  <div class="mx-auto mt-4 max-w-6xl overflow-hidden px-5">
+    <div class="flex items-center gap-3 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white">
+      <div class="flex w-full overflow-hidden">
+        <div class="marquee flex shrink-0 items-center gap-8 whitespace-nowrap pr-8">
+          <span>✦ Free delivery over ₦50,000</span><span>✦ 30-day returns</span><span>✦ Secure checkout</span><span>✦ Pay on delivery</span>
+          <span>✦ Free delivery over ₦50,000</span><span>✦ 30-day returns</span><span>✦ Secure checkout</span><span>✦ Pay on delivery</span>
+        </div>
+      </div>
+      <a href="#" class="hidden shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 sm:inline">Get the app</a>
+    </div>
+  </div>
+
+  <!-- ============ PRODUCTS ============ -->
+  <section id="products" class="mx-auto max-w-6xl px-5 py-20">
+    <div class="text-center">
+      <p class="eyebrow text-accent-600">Our products</p>
+      <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Pick what fits <span class="em text-brand-600">your style</span></h2>
+      <p class="mt-2 text-slate-500">Transparent pricing. No hidden fees. Checkout in under a minute.</p>
+    </div>
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" id="grid"></div>
+  </section>
+
+  <!-- ============ DEALS STRIP ============ -->
+  <section id="deals" class="mx-auto max-w-6xl px-5">
+    <div class="flex items-center justify-between rounded-2xl bg-brand-500 px-5 py-3 text-white">
+      <p class="font-semibold">Top picks <span class="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">Up to 35% off</span></p>
+      <a href="#" class="text-sm font-medium underline-offset-4 hover:underline">See all →</a>
+    </div>
+  </section>
+
+  <!-- ============ WHY US ============ -->
+  <section id="why" class="mx-auto max-w-6xl px-5 py-20">
+    <div class="text-center">
+      <p class="eyebrow text-accent-600">Why shop with us</p>
+      <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Shopping you can <span class="em text-brand-600">actually trust</span></h2>
+    </div>
+    <div class="mt-10 grid gap-5 sm:grid-cols-3">
+      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+        <div class="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 text-xl">🛡️</div>
+        <h3 class="mt-4 font-bold text-slate-900">Buyer protection</h3>
+        <p class="mt-1 text-sm text-slate-500">Every order is covered. Not happy? Full refund, no questions.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+        <div class="grid h-11 w-11 place-items-center rounded-xl bg-grass-500/10 text-grass-600 text-xl">🌿</div>
+        <h3 class="mt-4 font-bold text-slate-900">Quality checked</h3>
+        <p class="mt-1 text-sm text-slate-500">Hand-picked products, vetted suppliers, honest descriptions.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
+        <div class="grid h-11 w-11 place-items-center rounded-xl bg-accent-50 text-accent-600 text-xl">⚡</div>
+        <h3 class="mt-4 font-bold text-slate-900">Fast delivery</h3>
+        <p class="mt-1 text-sm text-slate-500">Same-day in Lagos, nationwide in 2–4 days. Track every step.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEWSLETTER / CTA ============ -->
+  <section id="contact" class="mx-auto max-w-6xl px-5 pb-20">
+    <div class="overflow-hidden rounded-3xl bg-gradient-to-br from-accent-50 to-brand-50 p-8 sm:p-12">
+      <div class="grid items-center gap-6 sm:grid-cols-2">
+        <div>
+          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Get 10% off your first order</h2>
+          <p class="mt-2 text-slate-600">Drop your email — we’ll send a code and the best deals. No spam.</p>
+        </div>
+        <form class="flex gap-2" onsubmit="return false">
+          <input type="email" placeholder="you@email.com" class="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500" />
+          <button class="shrink-0 rounded-full bg-grass-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-grass-600">Get code</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="bg-navy-900 text-slate-300">
+    <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <div class="flex items-center gap-2 font-bold text-white">
+          <span class="grid h-8 w-8 place-items-center rounded-xl bg-brand-500 text-white">◆</span> Shopfront
+        </div>
+        <p class="mt-3 max-w-xs text-sm text-slate-400">Quality products, honest prices, delivered fast across Nigeria.</p>
+        <div class="mt-4 flex gap-3 text-slate-400">
+          <a href="#" aria-label="Instagram" class="hover:text-white">IG</a>
+          <a href="#" aria-label="Twitter" class="hover:text-white">X</a>
+          <a href="#" aria-label="TikTok" class="hover:text-white">TT</a>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-white">Shop</p>
+        <ul class="mt-3 space-y-2 text-sm text-slate-400">
+          <li><a class="hover:text-white" href="#">New in</a></li>
+          <li><a class="hover:text-white" href="#">Best sellers</a></li>
+          <li><a class="hover:text-white" href="#">Deals</a></li>
+          <li><a class="hover:text-white" href="#">Gift cards</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-white">Company</p>
+        <ul class="mt-3 space-y-2 text-sm text-slate-400">
+          <li><a class="hover:text-white" href="#">About us</a></li>
+          <li><a class="hover:text-white" href="#">Careers</a></li>
+          <li><a class="hover:text-white" href="#">Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-white">Help</p>
+        <ul class="mt-3 space-y-2 text-sm text-slate-400">
+          <li><a class="hover:text-white" href="#">Contact</a></li>
+          <li><a class="hover:text-white" href="#">Shipping</a></li>
+          <li><a class="hover:text-white" href="#">Returns</a></li>
+          <li><a class="hover:text-white" href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-5 py-5 text-xs text-slate-500 sm:flex-row">
+        <span>© 2026 Shopfront Ltd. All rights reserved.</span>
+        <div class="flex gap-4"><a class="hover:text-white" href="#">Privacy</a><a class="hover:text-white" href="#">Terms</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ PRODUCT DATA + RENDER (swap for your real catalog/API) ============ -->
+  <script>
+    const PRODUCTS = [
+      { name: 'Classic Tee',        price: '₦12,500', badge: 'New',         left: 18, seed: 'p1' },
+      { name: 'Canvas Tote',        price: '₦8,000',  badge: 'Best seller', left: 7,  seed: 'p2' },
+      { name: 'Leather Slides',     price: '₦15,000', badge: null,          left: 25, seed: 'p3' },
+      { name: 'Linen Shirt',        price: '₦22,000', badge: 'Most loved',  left: 4,  seed: 'p4' },
+      { name: 'Beaded Bag',         price: '₦18,500', badge: null,          left: 11, seed: 'p5' },
+      { name: 'Ankara Set',         price: '₦26,000', badge: 'Limited',     left: 3,  seed: 'p6' },
+    ];
+
+    const badgeColor = {
+      'New': 'bg-brand-50 text-brand-700',
+      'Best seller': 'bg-grass-500/10 text-grass-600',
+      'Most loved': 'bg-accent-50 text-accent-600',
+      'Limited': 'bg-amber-50 text-amber-700',
+    };
+
+    document.getElementById('grid').innerHTML = PRODUCTS.map(p => `
+      <article class="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-1">
+        <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+          <img src="https://picsum.photos/seed/${p.seed}/600/450" alt="${p.name}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+          ${p.badge ? `<span class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold ${badgeColor[p.badge] || 'bg-white text-slate-700'}">${p.badge}</span>` : ''}
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-slate-900">${p.name}</h3>
+          <p class="mt-0.5 text-sm text-slate-500">Free delivery · in stock</p>
+          <div class="mt-3 flex items-center justify-between">
+            <div>
+              <p class="text-lg font-extrabold text-slate-900">${p.price}</p>
+              <p class="text-xs text-slate-400">${p.left} left</p>
+            </div>
+            <button class="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600">Add</button>
+          </div>
+          <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div class="h-full rounded-full bg-brand-500" style="width:${Math.min(100, p.left * 4)}%"></div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  </script>
+</body>
+</html>

@@ -106,7 +106,7 @@ function Services() {
                   mobileSkip
                   className="w-4/5 shrink-0 snap-center sm:w-auto sm:shrink"
                 >
-                  <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-brand-blue/40 hover:shadow-xl hover:shadow-brand-blue/5">
+                  <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-1">
                     <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                       {s.image && (
                         <img

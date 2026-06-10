@@ -52,9 +52,7 @@ function Hero() {
           <h1 className="mt-5 text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 drop-shadow-[0_2px_12px_rgba(255,255,255,0.7)] sm:text-6xl md:mt-8 md:text-7xl lg:text-8xl">
             A spotless home,
             <br />
-            <span className="italic bg-linear-to-r from-brand-blue to-brand-pink-deep bg-clip-text text-transparent">
-              without the hassle
-            </span>
+            <em className="text-brand-blue">without the hassle</em>
           </h1>
 
           <p className="mx-auto mt-4 max-w-xl text-base text-slate-800 drop-shadow-[0_1px_8px_rgba(255,255,255,0.8)] md:mt-7 md:text-lg">

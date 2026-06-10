@@ -56,12 +56,14 @@ const cols = [
 
 function Footer() {
   return (
-    <footer id="contact" className="border-t border-slate-100 bg-brand-pink-soft">
+    <footer id="contact" className="bg-brand-navy text-slate-400">
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <Logo />
-            <p className="mt-4 max-w-xs text-sm text-slate-600">
+            <span className="inline-flex rounded-xl bg-white px-3 py-2 shadow-sm">
+              <Logo />
+            </span>
+            <p className="mt-4 max-w-xs text-sm text-slate-400">
               Professional home and office cleaning, delivered with care.
               Bonded, insured, and 100% satisfaction guaranteed.
             </p>
@@ -74,7 +76,7 @@ function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm transition ${hoverClass}`}
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition ${hoverClass}`}
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -84,13 +86,13 @@ function Footer() {
 
           {cols.map((c) => (
             <div key={c.title}>
-              <h4 className="text-sm font-semibold text-slate-900">{c.title}</h4>
+              <h4 className="text-sm font-semibold text-white">{c.title}</h4>
               <ul className="mt-4 space-y-2.5">
                 {c.links.map((l) => (
                   <li key={`${c.title}-${l.label}`}>
                     <Link
                       to={l.to}
-                      className="text-sm text-slate-600 transition hover:text-brand-blue"
+                      className="text-sm text-slate-400 transition hover:text-white"
                     >
                       {l.label}
                     </Link>
@@ -101,12 +103,12 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-pink-200/60 pt-6 text-xs text-slate-500 md:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-slate-500 md:flex-row">
           <div>© 2026 Speedtouch Cleanings and Hygiene Ltd. All rights reserved.</div>
           <div className="flex gap-5">
-            <Link to="/privacy" className="hover:text-brand-blue">Privacy</Link>
-            <Link to="/terms" className="hover:text-brand-blue">Terms</Link>
-            <Link to="/contact" className="hover:text-brand-blue">Contact</Link>
+            <Link to="/privacy" className="hover:text-white">Privacy</Link>
+            <Link to="/terms" className="hover:text-white">Terms</Link>
+            <Link to="/contact" className="hover:text-white">Contact</Link>
           </div>
         </div>
       </div>
