@@ -6,7 +6,7 @@ import { STATUS_META } from '../../data/orders'
 import { ORDER_STATUSES, updateOrderStatus } from '../../lib/orders'
 import { useOrder } from '../../hooks/useOrders'
 
-const REVIEW_URL = 'https://speedtouch-virid.vercel.app/reviews'
+const REVIEW_URL = 'https://speedtouch.com.ng/reviews'
 
 function normalizeNgPhone(raw) {
   if (!raw) return ''

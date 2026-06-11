@@ -1,0 +1,34 @@
+# Speedtouch — Apache/cPanel config for the built SPA.
+# Lives in public/ so Vite copies it into dist/ on every build.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) Force HTTPS (cPanel AutoSSL must be active for the domain)
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 2) Serve real files/folders as-is (assets, sw.js, favicon, etc.)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # 3) Everything else -> index.html so React Router handles the route
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Hashed assets never change — cache them hard
+  <FilesMatch "\.(js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|mp4)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # The app shell + service worker must always revalidate (overrides the above)
+  <FilesMatch "(index\.html|sw\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# Gzip text assets when available
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

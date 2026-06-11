@@ -6,7 +6,7 @@ if (typeof window !== 'undefined' && !isSupabaseConfigured) {
   // eslint-disable-next-line no-console
   console.warn(
     '[Speedtouch] Supabase env vars are missing. ' +
-      'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables, then redeploy.',
+      'Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env, then rebuild.',
   )
 }
 

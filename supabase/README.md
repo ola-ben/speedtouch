@@ -26,8 +26,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 
 Find both values in Supabase → **Project Settings → API**.
 
-On Vercel, add the same two variables under **Project → Settings → Environment
-Variables** so production builds can talk to Supabase.
+Put the same two variables in your local `.env` before running `npm run build`
+so production builds can talk to Supabase (Vite bakes them into the bundle).
 
 ## 4. Create your admin user
 1. Supabase dashboard → **Authentication → Users → Add user**.

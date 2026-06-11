@@ -5,4 +5,4 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /order/
 
-Sitemap: https://speedtouch-virid.vercel.app/sitemap.xml
+Sitemap: https://speedtouch.com.ng/sitemap.xml
