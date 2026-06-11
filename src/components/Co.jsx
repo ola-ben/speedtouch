@@ -80,7 +80,7 @@ function Co() {
         </div>
 
         <Reveal>
-        <div id="book" className="mt-16 overflow-hidden rounded-3xl bg-linear-to-br from-brand-blue-soft via-white to-brand-pink-soft p-10 md:p-14">
+        <div id="book" className="mt-16 overflow-hidden rounded-3xl bg-brand-blue-soft p-10 md:p-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
             <div>
               <h3 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">

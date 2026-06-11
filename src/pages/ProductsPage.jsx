@@ -130,7 +130,7 @@ function ProductsPage() {
                 key={i}
                 className="overflow-hidden rounded-lg border border-slate-200 bg-white"
               >
-                <div className="aspect-square animate-pulse bg-slate-100" />
+                <div className="aspect-[5/4] animate-pulse bg-slate-100" />
                 <div className="space-y-2 p-3">
                   <div className="h-3 animate-pulse rounded bg-slate-100" />
                   <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
@@ -170,52 +170,61 @@ function ProductsPage() {
             {filtered.map((p) => (
               <article
                 key={p.id}
-                className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-brand-blue/40 hover:shadow-md hover:shadow-brand-blue/5"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-1"
               >
-                <Link to={`/products/${p.id}`} className="group block">
-                  <div className="relative aspect-square overflow-hidden bg-slate-100">
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      className={`h-full w-full object-cover transition duration-300 group-hover:scale-105 ${
-                        p.stock === 0 ? 'opacity-60 grayscale' : ''
-                      }`}
-                    />
-                    {p.stock === 0 ? (
-                      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur">
-                        Sold out
-                      </span>
-                    ) : p.discount > 0 ? (
-                      <span className="absolute right-1.5 top-1.5 rounded bg-brand-pink-soft px-1.5 py-0.5 text-[10px] font-bold text-brand-pink-deep">
-                        -{p.discount}%
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="px-3 pt-3">
-                    <h3 className="line-clamp-2 min-h-[2.4em] text-xs leading-snug text-slate-800 md:text-sm">
+                <Link
+                  to={`/products/${p.id}`}
+                  className="relative block aspect-[5/4] overflow-hidden bg-slate-100"
+                >
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    loading="lazy"
+                    className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
+                      p.stock === 0 ? 'opacity-60 grayscale' : ''
+                    }`}
+                  />
+                  {p.stock === 0 ? (
+                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur">
+                      Sold out
+                    </span>
+                  ) : p.discount > 0 ? (
+                    <span className="absolute left-3 top-3 rounded-full bg-brand-pink-deep px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
+                      -{p.discount}%
+                    </span>
+                  ) : null}
+                </Link>
+
+                <div className="flex flex-1 flex-col p-3">
+                  <Link to={`/products/${p.id}`}>
+                    <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug text-slate-900 transition group-hover:text-brand-blue">
                       {p.name}
                     </h3>
-                    <div className="mt-1 text-sm font-bold text-slate-900 md:text-base">
-                      ₦{p.price.toLocaleString('en-NG')}
+                  </Link>
+
+                  <div className="mt-auto pt-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-base font-extrabold text-slate-900 md:text-lg">
+                        ₦{p.price.toLocaleString('en-NG')}
+                      </span>
+                      {p.original ? (
+                        <span className="text-xs text-slate-400 line-through">
+                          ₦{p.original.toLocaleString('en-NG')}
+                        </span>
+                      ) : null}
                     </div>
-                    {p.original ? (
-                      <div className="text-[10px] text-slate-400 line-through md:text-xs">
-                        ₦{p.original.toLocaleString('en-NG')}
-                      </div>
-                    ) : null}
+
                     <StockBar stock={p.stock} />
+
+                    <button
+                      type="button"
+                      onClick={() => addItem(p)}
+                      disabled={p.stock === 0}
+                      className="mt-2.5 w-full rounded-full bg-brand-blue px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-blue-deep disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                    >
+                      {p.stock === 0 ? 'Sold out' : 'Add to cart'}
+                    </button>
                   </div>
-                </Link>
-                <div className="mt-2 px-3 pb-3">
-                  <button
-                    type="button"
-                    onClick={() => addItem(p)}
-                    disabled={p.stock === 0}
-                    className="w-full rounded-full bg-brand-blue px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:hover:bg-slate-300"
-                  >
-                    {p.stock === 0 ? 'Sold out' : 'Add to cart'}
-                  </button>
                 </div>
               </article>
             ))}

@@ -4,6 +4,26 @@ const TABLE = 'services'
 
 export const SERVICE_TAGS = ['Home', 'Office', 'Special', 'Add-on']
 
+// Dev-only demo service. `import.meta.env.DEV` is `false` in production builds,
+// so Vite strips this array — it never ships when you push/deploy. It only
+// shows locally when Supabase isn't configured, so you can preview the cards.
+const DEMO_SERVICES = import.meta.env.DEV
+  ? [
+      {
+        id: 'demo-standard-clean',
+        name: 'Standard Home Cleaning',
+        description:
+          'A thorough top-to-bottom clean — dusting, mopping, kitchen and bathrooms, all surfaces wiped down. Demo service (local preview only).',
+        tag: 'Home',
+        image: 'https://picsum.photos/seed/speedtouch-service/800/600',
+        price: 25000,
+        duration: 'visit',
+        popular: true,
+        sortOrder: 0,
+      },
+    ]
+  : []
+
 function rowToService(row) {
   if (!row) return null
   return {
@@ -34,7 +54,7 @@ function serviceToRow(s) {
 }
 
 export async function fetchServices() {
-  if (!isSupabaseConfigured) return []
+  if (!isSupabaseConfigured) return DEMO_SERVICES
   const { data, error } = await supabase
     .from(TABLE)
     .select('*')
@@ -45,7 +65,7 @@ export async function fetchServices() {
 }
 
 export async function fetchServiceById(id) {
-  if (!isSupabaseConfigured) return null
+  if (!isSupabaseConfigured) return DEMO_SERVICES.find((s) => s.id === id) ?? null
   const { data, error } = await supabase
     .from(TABLE)
     .select('*')

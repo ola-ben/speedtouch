@@ -2,6 +2,28 @@ import { supabase, isSupabaseConfigured } from './supabase'
 
 const TABLE = 'products'
 
+// Dev-only demo product. `import.meta.env.DEV` is `false` in production builds,
+// so Vite strips this array — it never ships when you push/deploy. It only
+// shows locally when Supabase isn't configured, so you can preview the cards.
+const DEMO_PRODUCTS = import.meta.env.DEV
+  ? [
+      {
+        id: 'demo-1',
+        name: 'Multi-Surface Cleaning Spray (Eco-Friendly, 750ml)',
+        description:
+          'Plant-based, non-toxic spray that cuts through grease and grime on any surface — safe around kids and pets. Demo product (local preview only).',
+        category: 'Supplies',
+        image: 'https://picsum.photos/seed/speedtouch-demo/600/600',
+        price: 4500,
+        original: 6000,
+        discount: 25,
+        stock: 8,
+        rating: 4.8,
+        reviews: 23,
+      },
+    ]
+  : []
+
 function rowToProduct(row) {
   if (!row) return null
   const original = row.original ?? null
@@ -39,7 +61,7 @@ function productToRow(p) {
 }
 
 export async function fetchProducts() {
-  if (!isSupabaseConfigured) return []
+  if (!isSupabaseConfigured) return DEMO_PRODUCTS
   const { data, error } = await supabase
     .from(TABLE)
     .select('*')
@@ -49,7 +71,7 @@ export async function fetchProducts() {
 }
 
 export async function fetchProductById(id) {
-  if (!isSupabaseConfigured) return null
+  if (!isSupabaseConfigured) return DEMO_PRODUCTS.find((p) => p.id === id) ?? null
   const { data, error } = await supabase
     .from(TABLE)
     .select('*')
