@@ -186,7 +186,7 @@ function AdminOrderDetailPage() {
                         className="block h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100"
                       >
                         {it.image ? (
-                          <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
+                          <img src={it.image} alt={it.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                         ) : (
                           <div className="h-full w-full bg-linear-to-br from-brand-blue-soft to-brand-pink-soft" />
                         )}
@@ -194,7 +194,7 @@ function AdminOrderDetailPage() {
                     ) : (
                       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100">
                         {it.image && (
-                          <img src={it.image} alt="" className="h-full w-full object-cover" />
+                          <img src={it.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                         )}
                       </div>
                     )}

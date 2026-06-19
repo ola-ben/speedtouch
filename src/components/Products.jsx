@@ -90,10 +90,6 @@ function Products() {
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
               Quality cleaning supplies, made for everyday use
             </h2>
-            <p className="mt-4 text-slate-600">
-              Carefully selected products that get the job done — eco-friendly,
-              durable, and honestly priced.
-            </p>
           </div>
         </Reveal>
 

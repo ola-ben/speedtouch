@@ -62,8 +62,8 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items, hydrated])
 
-  const showToast = useCallback((message) => {
-    setToast({ message, id: Date.now() })
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type, id: Date.now() })
   }, [])
 
   useEffect(() => {

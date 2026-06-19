@@ -57,6 +57,8 @@ function AdminCustomerDetailPage() {
               <img
                 src={customer.avatar}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="mx-auto h-20 w-20 rounded-full object-cover"
               />
               <h1 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">

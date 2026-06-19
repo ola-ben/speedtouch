@@ -15,8 +15,8 @@ function HomePage() {
     <>
       <Hero />
       <Marquee />
-      <Services />
       <Products />
+      <Services />
       <Co />
     </>
   )

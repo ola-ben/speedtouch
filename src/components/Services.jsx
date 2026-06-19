@@ -46,9 +46,6 @@ function Services() {
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
               Pick the clean that fits your space
             </h2>
-            <p className="mt-4 text-slate-600">
-              Transparent pricing. No hidden fees. Book any service in under a minute.
-            </p>
           </div>
         </Reveal>
 

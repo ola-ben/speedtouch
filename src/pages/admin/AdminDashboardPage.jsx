@@ -232,7 +232,7 @@ function AdminDashboardPage() {
                 >
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-slate-100">
                     {p.image && (
-                      <img src={p.image} alt="" className="h-full w-full object-cover" />
+                      <img src={p.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">

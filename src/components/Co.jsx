@@ -88,8 +88,7 @@ function Co() {
               </h3>
               <p className="mt-3 text-slate-600">
                 Tell us about your space on WhatsApp and we'll send you a
-                quote — with 20% off your first clean. No commitment, no
-                calls.
+                quote. No commitment, no calls.
               </p>
             </div>
             <form

@@ -36,6 +36,8 @@ function Hero() {
             src={HERO_POSTER}
             alt=""
             aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         )}

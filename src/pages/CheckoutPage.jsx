@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext'
 import { createOrder, generateOrderId } from '../lib/orders'
 import { isSupabaseConfigured } from '../lib/supabase'
 import { buildOrderMessage, WHATSAPP_NUMBER } from '../lib/whatsapp'
+import { humanizeError } from '../lib/errors'
 
 const SHIPPING_THRESHOLD = 40000
 const SHIPPING_COST = 2500
@@ -25,7 +26,6 @@ function CheckoutPage() {
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState(null)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
 
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
@@ -45,7 +45,6 @@ function CheckoutPage() {
     // Make sure the form's required fields are filled before placing an order.
     if (formRef.current && !formRef.current.reportValidity()) return
 
-    setError(null)
     setSubmitting(true)
 
     const fd = new FormData(formRef.current)
@@ -65,9 +64,11 @@ function CheckoutPage() {
           country: fd.get('country') ?? 'Nigeria',
         }
 
-    // 1. Write the order to Supabase first so admin sees it immediately.
-    try {
-      if (isSupabaseConfigured) {
+    // 1. Best-effort: record the order in Supabase for the admin dashboard.
+    //    A failure here must NEVER block the customer — the full order still
+    //    reaches us through the WhatsApp message in step 2.
+    if (isSupabaseConfigured) {
+      try {
         await createOrder({
           id: orderId,
           customerName,
@@ -89,11 +90,11 @@ function CheckoutPage() {
             quantity: it.quantity,
           })),
         })
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Order save failed (continuing to WhatsApp):', err)
+        showToast(humanizeError(err), 'error')
       }
-    } catch (err) {
-      setError(err.message || 'Could not save the order. Please try again.')
-      setSubmitting(false)
-      return
     }
 
     // 2. Open WhatsApp with a message that quotes the order ID for matching.
@@ -265,7 +266,7 @@ function CheckoutPage() {
                 {items.map((it) => (
                   <li key={it.id} className="flex gap-3 text-sm">
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-slate-100">
-                      <img src={it.image} alt={it.name} className="h-full w-full object-cover" />
+                      <img src={it.image} alt={it.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                       <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">
                         {it.quantity}
                       </span>
@@ -295,11 +296,6 @@ function CheckoutPage() {
                   <dd className="tabular-nums">₦{total.toLocaleString('en-NG')}</dd>
                 </div>
               </dl>
-              {error && (
-                <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-                  {error}
-                </p>
-              )}
               <button
                 type="button"
                 onClick={handlePaystackClick}
@@ -329,7 +325,9 @@ function CheckoutPage() {
                 {submitting ? 'Placing order…' : 'Order on WhatsApp'}
               </button>
               <p className="mt-2 text-center text-xs text-slate-500">
-                Our customer care will attend to you instantly.
+                WhatsApp opens with your order ready — just tap{' '}
+                <span className="font-semibold text-slate-700">Send</span> to notify us.
+                Our customer care replies instantly.
               </p>
             </div>
           </aside>

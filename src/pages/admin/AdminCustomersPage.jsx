@@ -111,6 +111,8 @@ function AdminCustomersPage() {
                         <img
                           src={c.avatar}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="h-9 w-9 rounded-full object-cover"
                         />
                         <div>
