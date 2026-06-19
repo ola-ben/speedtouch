@@ -38,7 +38,6 @@ const cols = [
     title: 'Company',
     links: [
       { label: 'About us', to: '/about' },
-      { label: 'Our cleaners', to: '/cleaners' },
       { label: 'Careers', to: '/careers' },
       { label: 'Reviews', to: '/reviews' },
     ],

@@ -18,7 +18,6 @@ const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
-const CleanersPage = lazy(() => import('./pages/CleanersPage'))
 const CareersPage = lazy(() => import('./pages/CareersPage'))
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
@@ -67,7 +66,6 @@ function Shell() {
             <Route path="/order/confirmation" element={<OrderConfirmationPage />} />
 
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/cleaners" element={<CleanersPage />} />
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/contact" element={<ContactPage />} />

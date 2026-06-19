@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ChevronRight, Lock, MapPin, ShieldCheck, Store, Truck } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
@@ -21,12 +21,25 @@ export const PICKUP_ADDRESS = {
   hours: 'Mon–Sat · 9am – 6pm',
 }
 
+// Remember the customer's checkout details so they don't re-type on every order.
+const SAVED_CHECKOUT_KEY = 'speedtouch_checkout_v1'
+
+function loadSavedCheckout() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_CHECKOUT_KEY)) || {}
+  } catch {
+    return {}
+  }
+}
+
 function CheckoutPage() {
   const { items, count, subtotal, clearCart, showToast } = useCart()
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
+  // Pre-fill from the last order (read once on mount).
+  const saved = useMemo(() => loadSavedCheckout(), [])
 
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
 
@@ -64,6 +77,26 @@ function CheckoutPage() {
           country: fd.get('country') ?? 'Nigeria',
         }
 
+    // Remember these details so the next order is pre-filled.
+    try {
+      localStorage.setItem(
+        SAVED_CHECKOUT_KEY,
+        JSON.stringify({
+          firstName: fd.get('firstName') ?? '',
+          lastName: fd.get('lastName') ?? '',
+          email: customerEmail ?? '',
+          phone: customerPhone ?? '',
+          address: fd.get('address') ?? '',
+          city: fd.get('city') ?? '',
+          state: fd.get('state') ?? '',
+          postal: fd.get('postal') ?? '',
+          country: fd.get('country') ?? 'Nigeria',
+        }),
+      )
+    } catch {
+      // localStorage unavailable (private mode) — not critical.
+    }
+
     // 1. Best-effort: record the order in Supabase for the admin dashboard.
     //    A failure here must NEVER block the customer — the full order still
     //    reaches us through the WhatsApp message in step 2.
@@ -91,7 +124,6 @@ function CheckoutPage() {
           })),
         })
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error('Order save failed (continuing to WhatsApp):', err)
         showToast(humanizeError(err), 'error')
       }
@@ -155,8 +187,8 @@ function CheckoutPage() {
             <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <legend className="px-2 text-sm font-semibold text-slate-900">Contact</legend>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Email" type="email" name="email" required autoComplete="email" />
-                <Field label="Phone" type="tel" name="phone" required autoComplete="tel" />
+                <Field label="Email" type="email" name="email" required autoComplete="email" defaultValue={saved.email} />
+                <Field label="Phone" type="tel" name="phone" required autoComplete="tel" defaultValue={saved.phone} />
               </div>
             </fieldset>
 
@@ -188,15 +220,15 @@ function CheckoutPage() {
                   Shipping address
                 </legend>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="First name" name="firstName" required autoComplete="given-name" />
-                  <Field label="Last name" name="lastName" required autoComplete="family-name" />
+                  <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={saved.firstName} />
+                  <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={saved.lastName} />
                   <div className="sm:col-span-2">
-                    <Field label="Street address" name="address" required autoComplete="street-address" />
+                    <Field label="Street address" name="address" required autoComplete="street-address" defaultValue={saved.address} />
                   </div>
-                  <Field label="City" name="city" required autoComplete="address-level2" />
-                  <Field label="State" name="state" required autoComplete="address-level1" />
-                  <Field label="Postal code" name="postal" required autoComplete="postal-code" />
-                  <Field label="Country" name="country" defaultValue="Nigeria" required />
+                  <Field label="City" name="city" required autoComplete="address-level2" defaultValue={saved.city} />
+                  <Field label="State" name="state" required autoComplete="address-level1" defaultValue={saved.state} />
+                  <Field label="Postal code" name="postal" required autoComplete="postal-code" defaultValue={saved.postal} />
+                  <Field label="Country" name="country" required defaultValue={saved.country || 'Nigeria'} />
                 </div>
               </fieldset>
             ) : (
@@ -225,8 +257,8 @@ function CheckoutPage() {
                   order number to collect.
                 </p>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <Field label="First name" name="firstName" required autoComplete="given-name" />
-                  <Field label="Last name" name="lastName" required autoComplete="family-name" />
+                  <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={saved.firstName} />
+                  <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={saved.lastName} />
                 </div>
               </fieldset>
             )}
