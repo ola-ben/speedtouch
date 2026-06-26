@@ -334,7 +334,7 @@ function AdminOrderDetailPage() {
                 {order.paymentReference && (
                   <div>
                     <dt className="text-xs uppercase tracking-wider text-slate-500">
-                      Paystack reference
+                      Payment reference
                     </dt>
                     <dd className="mt-0.5 break-all font-mono text-xs text-slate-900">
                       {order.paymentReference}

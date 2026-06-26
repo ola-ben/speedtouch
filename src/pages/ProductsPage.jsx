@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Search, X } from 'lucide-react'
+import { ChevronRight, Search, SlidersHorizontal, X } from 'lucide-react'
 import { categories } from '../data/products'
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
@@ -11,8 +11,11 @@ function ProductsPage() {
   const [category, setCategory] = useState('all')
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('featured')
+  const [filterOpen, setFilterOpen] = useState(false)
   const { addItem } = useCart()
   const { products, loading, error } = useProducts()
+
+  const activeLabel = categories.find((c) => c.id === category)?.label ?? 'All'
 
   useDocumentTitle(
     'Cleaning Supplies & Tools',
@@ -68,7 +71,8 @@ function ProductsPage() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
+          {/* Search — desktop top bar (on mobile it lives in the filter sheet) */}
+          <div className="relative hidden flex-1 lg:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="search"
@@ -88,6 +92,17 @@ function ProductsPage() {
               </button>
             )}
           </div>
+
+          {/* Filter & search button — mobile / tablet only (opens full-screen sheet) */}
+          <button
+            type="button"
+            onClick={() => setFilterOpen(true)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-brand-blue hover:text-brand-blue lg:hidden"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {category === 'all' && !query ? 'Filter & search' : `Filter: ${activeLabel}`}
+          </button>
+
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
@@ -100,7 +115,8 @@ function ProductsPage() {
           </select>
         </div>
 
-        <div className="no-scrollbar mt-4 -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
+        {/* Category tabs — desktop only; mobile uses the filter sheet below */}
+        <div className="mt-4 hidden gap-2 lg:flex lg:flex-wrap">
           {categories.map((c) => (
             <button
               key={c.id}
@@ -116,6 +132,76 @@ function ProductsPage() {
             </button>
           ))}
         </div>
+
+        {/* Mobile full-screen filter sheet */}
+        {filterOpen && (
+          <div className="fixed inset-0 z-50 flex flex-col bg-white lg:hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
+              <h2 className="text-base font-semibold text-slate-900">Filter &amp; search</h2>
+              <button
+                type="button"
+                onClick={() => setFilterOpen(false)}
+                aria-label="Close filters"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-5">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products"
+                  className="w-full rounded-full border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery('')}
+                    aria-label="Clear search"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Categories
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCategory(c.id)}
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                      category === c.id
+                        ? 'border-brand-blue bg-brand-blue text-white'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-brand-blue hover:text-brand-blue'
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 p-4">
+              <button
+                type="button"
+                onClick={() => setFilterOpen(false)}
+                className="w-full rounded-full bg-brand-blue px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-blue-deep"
+              >
+                Show {filtered.length} {filtered.length === 1 ? 'result' : 'results'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">

@@ -8,9 +8,6 @@ import { isSupabaseConfigured } from '../lib/supabase'
 import { buildOrderMessage, WHATSAPP_NUMBER } from '../lib/whatsapp'
 import { humanizeError } from '../lib/errors'
 
-const SHIPPING_THRESHOLD = 40000
-const SHIPPING_COST = 2500
-
 export const PICKUP_ADDRESS = {
   street: '7 Oluyoro Street, off Awolowo Avenue',
   area: 'Old Bolaji',
@@ -19,6 +16,13 @@ export const PICKUP_ADDRESS = {
   state: 'Oyo',
   country: 'Nigeria',
   hours: 'Mon–Sat · 9am – 6pm',
+}
+
+// Bank details shown for the direct-transfer payment option.
+const BANK = {
+  bank: 'Moniepoint',
+  account: '8212184496',
+  name: 'Speedtouch Cleanings',
 }
 
 // Remember the customer's checkout details so they don't re-type on every order.
@@ -44,17 +48,16 @@ function CheckoutPage() {
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
 
   const isPickup = deliveryMethod === 'pickup'
-  const shipping = isPickup ? 0 : subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
+  // Delivery fee isn't charged at checkout — it depends on the area and is
+  // communicated after payment is confirmed. So the total is just the subtotal.
+  const shipping = 0
   const total = subtotal + shipping
 
-  // Paystack is staged for later. For now we route everyone through WhatsApp.
-  const handlePaystackClick = () => {
-    showToast(
-      'Paystack coming soon — please order on WhatsApp, our team will attend to you instantly.',
-    )
-  }
-
-  const handleWhatsApp = async () => {
+  // Note: NOT async. We open WhatsApp synchronously inside the tap so iOS
+  // doesn't block it (Safari only allows window.open during a direct user
+  // gesture — an `await` beforehand loses that permission). The Supabase save
+  // runs in the background and never blocks the order.
+  const placeOrder = (paymentMethod) => {
     // Make sure the form's required fields are filled before placing an order.
     if (formRef.current && !formRef.current.reportValidity()) return
 
@@ -97,62 +100,60 @@ function CheckoutPage() {
       // localStorage unavailable (private mode) — not critical.
     }
 
-    // 1. Best-effort: record the order in Supabase for the admin dashboard.
-    //    A failure here must NEVER block the customer — the full order still
-    //    reaches us through the WhatsApp message in step 2.
-    if (isSupabaseConfigured) {
-      try {
-        await createOrder({
-          id: orderId,
-          customerName,
-          customerEmail,
-          customerPhone,
-          deliveryMethod,
-          shippingAddress,
-          paymentMethod: 'whatsapp',
-          paymentReference: null,
-          subtotal,
-          shipping,
-          total,
-          status: 'pending',
-          items: items.map((it) => ({
-            productId: it.id,
-            name: it.name,
-            image: it.image,
-            price: it.price,
-            quantity: it.quantity,
-          })),
-        })
-      } catch (err) {
-        console.error('Order save failed (continuing to WhatsApp):', err)
-        showToast(humanizeError(err), 'error')
-      }
+    // Build the WhatsApp message synchronously (before any async work).
+    let text = buildOrderMessage({
+      orderId,
+      items,
+      subtotal,
+      shipping,
+      total,
+      deliveryMethod,
+      customer: { name: customerName, email: customerEmail, phone: customerPhone },
+      shippingAddress,
+    })
+    if (paymentMethod === 'bank_transfer') {
+      text += `\n\n*Payment: Bank transfer*\n${BANK.bank} — ${BANK.account} (${BANK.name})\nI'll send proof of payment here.`
     }
+    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
 
-    // 2. Open WhatsApp with a message that quotes the order ID for matching.
-    const message = encodeURIComponent(
-      buildOrderMessage({
-        orderId,
-        items,
+    // Best-effort: record the order for the admin dashboard. Fire-and-forget so
+    // it never blocks the order — the full order also reaches us via WhatsApp.
+    if (isSupabaseConfigured) {
+      createOrder({
+        id: orderId,
+        customerName,
+        customerEmail,
+        customerPhone,
+        deliveryMethod,
+        shippingAddress,
+        paymentMethod,
+        paymentReference: null,
         subtotal,
         shipping,
         total,
-        deliveryMethod,
-        customer: {
-          name: customerName,
-          email: customerEmail,
-          phone: customerPhone,
-        },
-        shippingAddress,
-      }),
-    )
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`,
-      '_blank',
-      'noopener,noreferrer',
-    )
+        status: 'pending',
+        items: items.map((it) => ({
+          productId: it.id,
+          name: it.name,
+          image: it.image,
+          price: it.price,
+          quantity: it.quantity,
+        })),
+      }).catch((err) => {
+        console.error('Order save failed (order still sent via WhatsApp):', err)
+        showToast(humanizeError(err), 'error')
+      })
+    }
 
-    // 3. Clear cart and send the customer to a confirmation page.
+    // Open WhatsApp inside the gesture so iOS opens it reliably.
+    const waWindow = window.open(waUrl, '_blank')
+    if (!waWindow) {
+      // Popups fully blocked — open in the same tab as a fallback.
+      window.location.href = waUrl
+      return
+    }
+
+    // Clear cart and send the customer to the confirmation page.
     clearCart()
     navigate(
       `/order/confirmation?id=${orderId}&method=${deliveryMethod}`,
@@ -177,10 +178,7 @@ function CheckoutPage() {
 
         <form
           ref={formRef}
-          onSubmit={(e) => {
-            e.preventDefault()
-            handlePaystackClick()
-          }}
+          onSubmit={(e) => e.preventDefault()}
           className="mt-8 grid gap-8 lg:grid-cols-3"
         >
           <div className="space-y-8 lg:col-span-2">
@@ -200,7 +198,7 @@ function CheckoutPage() {
                 <DeliveryOption
                   icon={Truck}
                   title="Home delivery"
-                  body={`Doorstep delivery · ₦${SHIPPING_COST.toLocaleString('en-NG')} (free over ₦${SHIPPING_THRESHOLD.toLocaleString('en-NG')})`}
+                  body="Doorstep delivery · fee depends on your area"
                   selected={!isPickup}
                   onClick={() => setDeliveryMethod('delivery')}
                 />
@@ -212,6 +210,12 @@ function CheckoutPage() {
                   onClick={() => setDeliveryMethod('pickup')}
                 />
               </div>
+              {!isPickup && (
+                <p className="mt-3 rounded-lg bg-brand-blue-soft px-3 py-2 text-xs text-slate-600">
+                  Your delivery fee depends on your area and will be communicated
+                  after payment is confirmed.
+                </p>
+              )}
             </fieldset>
 
             {!isPickup ? (
@@ -270,20 +274,20 @@ function CheckoutPage() {
               </legend>
               <div className="rounded-xl bg-slate-50 p-4">
                 <div className="flex items-center gap-3">
-                  <PaystackLogo />
+                  <Store className="h-9 w-9 shrink-0 rounded-lg bg-brand-blue-soft p-2 text-brand-blue" />
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-semibold text-slate-900">
-                      Pay securely with Paystack
+                      Pay by bank transfer
                     </div>
                     <p className="mt-0.5 text-xs text-slate-600">
-                      Card, bank transfer, or USSD. Card details stay with
-                      Paystack — never on our servers.
+                      Transfer to our Moniepoint account, then send your proof on
+                      WhatsApp. Your order is confirmed once we receive payment.
                     </p>
                   </div>
                 </div>
               </div>
               <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-500">
-                <Lock className="h-3 w-3" /> 256-bit SSL · PCI DSS compliant
+                <Lock className="h-3 w-3" /> Secure checkout · HTTPS encrypted
               </p>
             </fieldset>
           </div>
@@ -317,49 +321,65 @@ function CheckoutPage() {
                   <dt className="text-slate-600">Subtotal</dt>
                   <dd className="tabular-nums">₦{subtotal.toLocaleString('en-NG')}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-600">{isPickup ? 'Pickup' : 'Shipping'}</dt>
-                  <dd className="tabular-nums">
-                    {shipping === 0 ? 'Free' : `₦${shipping.toLocaleString('en-NG')}`}
+                <div className="flex justify-between gap-3">
+                  <dt className="text-slate-600">{isPickup ? 'Pickup' : 'Delivery'}</dt>
+                  <dd className="text-right">
+                    {isPickup ? (
+                      'Free'
+                    ) : (
+                      <span className="text-xs text-slate-500">Fee confirmed after payment</span>
+                    )}
                   </dd>
                 </div>
                 <div className="flex justify-between border-t border-slate-100 pt-2 text-base font-semibold">
                   <dt>Total</dt>
                   <dd className="tabular-nums">₦{total.toLocaleString('en-NG')}</dd>
                 </div>
+                {!isPickup && (
+                  <p className="text-xs text-slate-400">
+                    Delivery fee (based on your area) is added after payment.
+                  </p>
+                )}
               </dl>
-              <button
-                type="button"
-                onClick={handlePaystackClick}
-                aria-disabled="true"
-                title="Paystack coming soon — order on WhatsApp instead"
-                className="mt-5 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-slate-300 px-5 py-3 text-sm font-semibold text-slate-500 shadow-sm transition hover:bg-slate-300"
-              >
-                Pay ₦{total.toLocaleString('en-NG')} with Paystack
-                <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                  Soon
-                </span>
-              </button>
-
-              <div className="my-3 flex items-center gap-3 text-xs text-slate-400">
-                <span className="h-px flex-1 bg-slate-200" />
-                or
-                <span className="h-px flex-1 bg-slate-200" />
+              <p className="mb-2 mt-5 text-sm font-semibold text-slate-900">
+                Pay by bank transfer
+              </p>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <dl className="space-y-1 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-slate-500">Bank</dt>
+                    <dd className="font-medium text-slate-900">{BANK.bank}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-slate-500">Account number</dt>
+                    <dd className="font-bold tabular-nums tracking-wide text-slate-900">
+                      {BANK.account}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-slate-500">Account name</dt>
+                    <dd className="font-medium text-slate-900">{BANK.name}</dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-xs text-slate-500">
+                  Transfer <span className="font-semibold text-slate-700">₦{total.toLocaleString('en-NG')}</span>{' '}
+                  to the account above, then tap the button to confirm your order and
+                  send your proof of payment on WhatsApp.
+                </p>
               </div>
-
               <button
                 type="button"
-                onClick={handleWhatsApp}
+                onClick={() => placeOrder('bank_transfer')}
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:opacity-60"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-5 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-brand-blue-deep disabled:opacity-60"
               >
                 <FaWhatsapp className="h-5 w-5" />
-                {submitting ? 'Placing order…' : 'Order on WhatsApp'}
+                {submitting ? 'Confirming…' : "I've sent the money — confirm order"}
               </button>
               <p className="mt-2 text-center text-xs text-slate-500">
-                WhatsApp opens with your order ready — just tap{' '}
-                <span className="font-semibold text-slate-700">Send</span> to notify us.
-                Our customer care replies instantly.
+                Opens WhatsApp with your order — tap{' '}
+                <span className="font-semibold text-slate-700">Send</span> and attach your
+                payment proof.
               </p>
             </div>
           </aside>
@@ -398,19 +418,6 @@ function DeliveryOption({ icon: Icon, title, body, selected, onClick }) {
         }`}
       />
     </button>
-  )
-}
-
-function PaystackLogo() {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      className="h-9 w-9 shrink-0 rounded-lg"
-      aria-label="Paystack"
-    >
-      <rect width="32" height="32" rx="8" fill="#011B33" />
-      <path d="M7 9h12v2.5H7V9zm0 4.5h18V16H7v-2.5zM7 18h12v2.5H7V18zm0 4.5h7V25H7v-2.5z" fill="#00C3F7" />
-    </svg>
   )
 }
 

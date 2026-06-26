@@ -17,7 +17,7 @@ const emptyForm = {
   id: '',
   name: '',
   description: '',
-  category: 'sprays',
+  category: 'cleaning-chemical',
   image: '',
   price: '',
   original: '',

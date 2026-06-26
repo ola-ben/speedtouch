@@ -1,11 +1,15 @@
 export const categories = [
   { id: 'all', label: 'All' },
-  { id: 'sprays', label: 'Sprays & Liquids' },
-  { id: 'tools', label: 'Tools & Equipment' },
-  { id: 'kits', label: 'Kits & Bundles' },
-  { id: 'accessories', label: 'Accessories' },
+  { id: 'bleach', label: 'Bleach' },
+  { id: 'laundry', label: 'Laundry' },
+  { id: 'laundry-chemical', label: 'Laundry Chemical' },
+  { id: 'cleaning-chemical', label: 'Cleaning Chemical' },
+  { id: 'laundry-material', label: 'Laundry Material' },
+  { id: 'tagging-materials', label: 'Tagging Materials' },
+  { id: 'packaging', label: 'Packaging' },
+  { id: 'cleaning-equipment', label: 'Cleaning Equipment' },
+  { id: 'services', label: 'Services' },
 ]
-
 export const products = [
   {
     id: 'multi-surface-cleaner',

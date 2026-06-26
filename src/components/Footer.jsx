@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaInstagram, FaFacebookF, FaTiktok } from 'react-icons/fa6'
+import { FaInstagram, FaFacebookF, FaTiktok, FaEnvelope } from 'react-icons/fa6'
 import Logo from './Logo'
 
 const socials = [
@@ -80,6 +80,14 @@ function Footer() {
                 </a>
               ))}
             </div>
+
+            <a
+              href="mailto:info@speedtouch.com"
+              className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"
+            >
+              <FaEnvelope className="h-4 w-4" />
+              info@speedtouch.com
+            </a>
           </div>
 
           {cols.map((c) => (

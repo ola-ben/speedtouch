@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: 'How do I pay?',
-    a: "Right now, the easiest way is to message us on WhatsApp after booking — we'll arrange bank transfer or pay-on-the-day. Online card payments (via Paystack) are coming soon.",
+    a: "At checkout you pay by bank transfer to our Moniepoint account, then tap to send your proof of payment on WhatsApp — we confirm your order instantly. Card payments are coming soon.",
   },
   {
     q: 'Do you clean outside Ibadan?',
