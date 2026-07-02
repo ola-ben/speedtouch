@@ -12,10 +12,29 @@ const SERVICES = [
   'Other',
 ]
 
+const SAVED_REVIEWER_KEY = 'speedtouch_reviewer_v1'
+
+function loadSavedReviewer() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_REVIEWER_KEY)) || {}
+  } catch {
+    return {}
+  }
+}
+
 function ReviewForm({ open, onClose }) {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [location, setLocation] = useState('')
+  const [name, setName] = useState(() => {
+    const saved = loadSavedReviewer()
+    return saved.name || ''
+  })
+  const [email, setEmail] = useState(() => {
+    const saved = loadSavedReviewer()
+    return saved.email || ''
+  })
+  const [location, setLocation] = useState(() => {
+    const saved = loadSavedReviewer()
+    return saved.location || ''
+  })
   const [service, setService] = useState('')
   const [rating, setRating] = useState(5)
   const [hoverRating, setHoverRating] = useState(0)
@@ -24,6 +43,31 @@ function ReviewForm({ open, onClose }) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [done, setDone] = useState(false)
+
+  const saveReviewerField = (field, val) => {
+    try {
+      const saved = loadSavedReviewer()
+      saved[field] = val
+      localStorage.setItem(SAVED_REVIEWER_KEY, JSON.stringify(saved))
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleNameChange = (val) => {
+    setName(val)
+    saveReviewerField('name', val)
+  }
+
+  const handleEmailChange = (val) => {
+    setEmail(val)
+    saveReviewerField('email', val)
+  }
+
+  const handleLocationChange = (val) => {
+    setLocation(val)
+    saveReviewerField('location', val)
+  }
 
   useEffect(() => {
     if (!open) return
@@ -134,7 +178,7 @@ function ReviewForm({ open, onClose }) {
                   required
                   maxLength={80}
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => handleNameChange(e.target.value)}
                   className={inputClass}
                 />
               </Field>
@@ -145,7 +189,7 @@ function ReviewForm({ open, onClose }) {
                     type="email"
                     maxLength={120}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     className={inputClass}
                   />
                 </Field>
@@ -154,7 +198,7 @@ function ReviewForm({ open, onClose }) {
                     type="text"
                     maxLength={80}
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    onChange={(e) => handleLocationChange(e.target.value)}
                     className={inputClass}
                   />
                 </Field>

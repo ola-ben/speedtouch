@@ -4,8 +4,25 @@ import { FaWhatsapp } from 'react-icons/fa6'
 import Reveal from './Reveal'
 import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 
+const SAVED_QUOTE_KEY = 'speedtouch_quote_details_v1'
+
 function Co() {
-  const [details, setDetails] = useState('')
+  const [details, setDetails] = useState(() => {
+    try {
+      return localStorage.getItem(SAVED_QUOTE_KEY) || ''
+    } catch {
+      return ''
+    }
+  })
+
+  const handleDetailsChange = (val) => {
+    setDetails(val)
+    try {
+      localStorage.setItem(SAVED_QUOTE_KEY, val)
+    } catch {
+      // ignore
+    }
+  }
 
   const handleQuote = (e) => {
     e.preventDefault()
@@ -98,7 +115,7 @@ function Co() {
               <input
                 type="text"
                 value={details}
-                onChange={(e) => setDetails(e.target.value)}
+                onChange={(e) => handleDetailsChange(e.target.value)}
                 placeholder="e.g. 3-bed flat in Bodija"
                 className="flex-1 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
               />

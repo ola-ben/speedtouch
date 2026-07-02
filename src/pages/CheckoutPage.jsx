@@ -42,8 +42,34 @@ function CheckoutPage() {
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
-  // Pre-fill from the last order (read once on mount).
-  const saved = useMemo(() => loadSavedCheckout(), [])
+  
+  const [formData, setFormData] = useState(() => {
+    const saved = loadSavedCheckout()
+    return {
+      firstName: saved.firstName || '',
+      lastName: saved.lastName || '',
+      email: saved.email || '',
+      phone: saved.phone || '',
+      address: saved.address || '',
+      city: saved.city || '',
+      state: saved.state || '',
+      postal: saved.postal || '',
+      country: saved.country || 'Nigeria',
+    }
+  })
+
+  const handleFieldChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value }
+      try {
+        localStorage.setItem(SAVED_CHECKOUT_KEY, JSON.stringify(updated))
+      } catch {
+        // ignore
+      }
+      return updated
+    })
+  }
 
   if (items.length === 0 && !submitting) return <Navigate to="/cart" replace />
 
@@ -185,8 +211,8 @@ function CheckoutPage() {
             <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <legend className="px-2 text-sm font-semibold text-slate-900">Contact</legend>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Email" type="email" name="email" required autoComplete="email" defaultValue={saved.email} />
-                <Field label="Phone" type="tel" name="phone" required autoComplete="tel" defaultValue={saved.phone} />
+                <Field label="Email" type="email" name="email" required autoComplete="email" value={formData.email} onChange={handleFieldChange} />
+                <Field label="Phone" type="tel" name="phone" required autoComplete="tel" value={formData.phone} onChange={handleFieldChange} />
               </div>
             </fieldset>
 
@@ -224,15 +250,15 @@ function CheckoutPage() {
                   Shipping address
                 </legend>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={saved.firstName} />
-                  <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={saved.lastName} />
+                  <Field label="First name" name="firstName" required autoComplete="given-name" value={formData.firstName} onChange={handleFieldChange} />
+                  <Field label="Last name" name="lastName" required autoComplete="family-name" value={formData.lastName} onChange={handleFieldChange} />
                   <div className="sm:col-span-2">
-                    <Field label="Street address" name="address" required autoComplete="street-address" defaultValue={saved.address} />
+                    <Field label="Street address" name="address" required autoComplete="street-address" value={formData.address} onChange={handleFieldChange} />
                   </div>
-                  <Field label="City" name="city" required autoComplete="address-level2" defaultValue={saved.city} />
-                  <Field label="State" name="state" required autoComplete="address-level1" defaultValue={saved.state} />
-                  <Field label="Postal code" name="postal" required autoComplete="postal-code" defaultValue={saved.postal} />
-                  <Field label="Country" name="country" required defaultValue={saved.country || 'Nigeria'} />
+                  <Field label="City" name="city" required autoComplete="address-level2" value={formData.city} onChange={handleFieldChange} />
+                  <Field label="State" name="state" required autoComplete="address-level1" value={formData.state} onChange={handleFieldChange} />
+                  <Field label="Postal code" name="postal" required autoComplete="postal-code" value={formData.postal} onChange={handleFieldChange} />
+                  <Field label="Country" name="country" required value={formData.country} onChange={handleFieldChange} />
                 </div>
               </fieldset>
             ) : (
@@ -261,8 +287,8 @@ function CheckoutPage() {
                   order number to collect.
                 </p>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={saved.firstName} />
-                  <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={saved.lastName} />
+                  <Field label="First name" name="firstName" required autoComplete="given-name" value={formData.firstName} onChange={handleFieldChange} />
+                  <Field label="Last name" name="lastName" required autoComplete="family-name" value={formData.lastName} onChange={handleFieldChange} />
                 </div>
               </fieldset>
             )}
