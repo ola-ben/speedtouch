@@ -60,9 +60,9 @@ function ContactPage() {
           <ContactCard
             icon={Mail}
             title="Email"
-            line1="info@speedtouch.com"
+            line1="info@speedtouch.com.ng"
             line2="We reply within 24 hours."
-            href="mailto:info@speedtouch.com"
+            href="mailto:info@speedtouch.com.ng"
           />
           <ContactCard
             icon={MapPin}

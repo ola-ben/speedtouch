@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext'
 
 const links = [
   { label: 'Home', to: '/' },
-  { label: 'Services', to: '/#services' },
+  { label: 'Services', to: '/services' },
   { label: 'Products', to: '/products' },
   { label: 'Pricing', to: '/#pricing' },
   { label: 'Contact', to: '/#contact' },

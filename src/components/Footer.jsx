@@ -82,11 +82,11 @@ function Footer() {
             </div>
 
             <a
-              href="mailto:info@speedtouch.com"
+              href="mailto:info@speedtouch.com.ng"
               className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"
             >
               <FaEnvelope className="h-4 w-4" />
-              info@speedtouch.com
+              info@speedtouch.com.ng
             </a>
           </div>
 

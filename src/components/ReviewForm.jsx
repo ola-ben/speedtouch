@@ -22,7 +22,7 @@ function loadSavedReviewer() {
   }
 }
 
-function ReviewForm({ open, onClose }) {
+function ReviewForm({ open, onClose, defaultService = '' }) {
   const [name, setName] = useState(() => {
     const saved = loadSavedReviewer()
     return saved.name || ''
@@ -35,7 +35,14 @@ function ReviewForm({ open, onClose }) {
     const saved = loadSavedReviewer()
     return saved.location || ''
   })
-  const [service, setService] = useState('')
+  const [service, setService] = useState(() => defaultService)
+
+  useEffect(() => {
+    if (open) {
+      setService(defaultService)
+    }
+  }, [open, defaultService])
+
   const [rating, setRating] = useState(5)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
