@@ -17,7 +17,7 @@ function TermsPage() {
           <span className="font-medium text-slate-900">Terms of Service</span>
         </nav>
 
-        <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
+        <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-900 md:text-5xl">
           Terms of Service
         </h1>
         <p className="mt-5 text-base text-slate-700 md:text-lg">
@@ -28,7 +28,7 @@ function TermsPage() {
           <div>
             <h2 className="text-xl font-semibold text-slate-900">1. Our Cleaning Services</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              We provide professional cleaning services and eco-friendly cleaning products in Ibadan, Nigeria. We send trained, vetted, and background-checked cleaners to your designated address. 
+              We provide professional cleaning services and eco-friendly cleaning products in Ibadan, Nigeria. We send trained, vetted, and background-checked cleaners to your designated address.
             </p>
           </div>
 
