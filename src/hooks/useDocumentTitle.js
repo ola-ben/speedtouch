@@ -19,5 +19,14 @@ export function useDocumentTitle(title, description) {
       }
       tag.setAttribute('content', description)
     }
+
+    // Update or create canonical link tag
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.setAttribute('rel', 'canonical')
+      document.head.appendChild(canonical)
+    }
+    canonical.setAttribute('href', window.location.origin + window.location.pathname)
   }, [title, description])
 }
