@@ -12,12 +12,17 @@ import AdminLayout from './components/admin/AdminLayout'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 
+const TermsPage = lazy(() => import('./pages/TermsPage'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+const WorkPage = lazy(() => import('./pages/WorkPage'))
 const ProductsPage = lazy(() => import('./pages/ProductsPage'))
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage'))
 const ServiceDetailPage = lazy(() => import('./pages/ServiceDetailPage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
+const AccountPage = lazy(() => import('./pages/AccountPage'))
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage'))
@@ -60,12 +65,16 @@ function Shell() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/work" element={<WorkPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:id" element={<ServiceDetailPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/account" element={<AccountPage />} />
             <Route path="/order/confirmation" element={<OrderConfirmationPage />} />
 
             <Route path="/about" element={<AboutPage />} />
@@ -97,6 +106,9 @@ function Shell() {
               <Route path="/admin/reviews" element={<AdminReviewsPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
             </Route>
+
+            {/* Catch-all 404 Route */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </main>

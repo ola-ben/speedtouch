@@ -18,6 +18,7 @@ create table if not exists public.orders (
   status           text not null default 'pending'
                    check (status in ('pending', 'paid', 'fulfilled', 'shipped', 'delivered', 'cancelled', 'refunded')),
   notes            text,
+  user_id          uuid references auth.users(id) on delete set null,
   placed_at        timestamptz not null default now(),
   updated_at       timestamptz not null default now()
 );
@@ -59,39 +60,55 @@ create policy "anyone can create order items"
   with check (true);
 
 drop policy if exists "authenticated can read orders" on public.orders;
-create policy "authenticated can read orders"
+create policy "admins can read all orders"
   on public.orders for select
   to authenticated
-  using (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');
+
+create policy "customers can read their own orders"
+  on public.orders for select
+  to authenticated
+  using (auth.uid() = user_id);
 
 drop policy if exists "authenticated can update orders" on public.orders;
-create policy "authenticated can update orders"
+create policy "admins can update orders"
   on public.orders for update
   to authenticated
-  using (true)
-  with check (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng')
+  with check (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');
 
 drop policy if exists "authenticated can delete orders" on public.orders;
-create policy "authenticated can delete orders"
+create policy "admins can delete orders"
   on public.orders for delete
   to authenticated
-  using (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');
 
 drop policy if exists "authenticated can read order items" on public.order_items;
-create policy "authenticated can read order items"
+create policy "admins can read all order items"
   on public.order_items for select
   to authenticated
-  using (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');
+
+create policy "customers can read their own order items"
+  on public.order_items for select
+  to authenticated
+  using (
+    exists (
+      select 1 from public.orders
+      where orders.id = order_items.order_id
+      and orders.user_id = auth.uid()
+    )
+  );
 
 drop policy if exists "authenticated can update order items" on public.order_items;
-create policy "authenticated can update order items"
+create policy "admins can update order items"
   on public.order_items for update
   to authenticated
-  using (true)
-  with check (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng')
+  with check (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');
 
 drop policy if exists "authenticated can delete order items" on public.order_items;
-create policy "authenticated can delete order items"
+create policy "admins can delete order items"
   on public.order_items for delete
   to authenticated
-  using (true);
+  using (auth.jwt() ->> 'email' = 'info@speedtouch.com.ng');

@@ -1,9 +1,11 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ChevronRight, Lock, MapPin, ShieldCheck, Store, Truck } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { createOrder, generateOrderId } from '../lib/orders'
+import { sendOrderEmails } from '../lib/email'
 import { isSupabaseConfigured } from '../lib/supabase'
 import { buildOrderMessage, WHATSAPP_NUMBER } from '../lib/whatsapp'
 import { humanizeError } from '../lib/errors'
@@ -38,10 +40,16 @@ function loadSavedCheckout() {
 
 function CheckoutPage() {
   const { items, count, subtotal, clearCart, showToast } = useCart()
+  const { user, isAuthenticated, signInWithGoogleIdToken } = useAuth()
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState('delivery')
+
+  // Auth modal states on checkout
+  const [showCheckoutAuthModal, setShowCheckoutAuthModal] = useState(false)
+  const [authError, setAuthError] = useState(null)
+  const [authSubmitting, setAuthSubmitting] = useState(false)
   
   const [formData, setFormData] = useState(() => {
     const saved = loadSavedCheckout()
@@ -57,6 +65,55 @@ function CheckoutPage() {
       country: saved.country || 'Nigeria',
     }
   })
+
+  const googleCheckoutBtnRef = useRef(null)
+
+  useEffect(() => {
+    if (isAuthenticated || !showCheckoutAuthModal) return
+
+    const initGoogleGsiCheckout = () => {
+      /* global google */
+      if (typeof google !== 'undefined' && googleCheckoutBtnRef.current) {
+        try {
+          google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '503549812427-u9qi8llrjfbd26cu2v79gbkol50pa2o.apps.googleusercontent.com',
+            callback: async (response) => {
+              setAuthError(null)
+              setAuthSubmitting(true)
+              try {
+                await signInWithGoogleIdToken(response.credential)
+                setShowCheckoutAuthModal(false)
+                showToast('Signed in successfully!', 'success')
+              } catch (err) {
+                setAuthError(err.message || 'Google sign in failed.')
+              } finally {
+                setAuthSubmitting(false)
+              }
+            },
+          })
+          google.accounts.id.renderButton(googleCheckoutBtnRef.current, {
+            theme: 'outline',
+            size: 'large',
+            shape: 'pill',
+            width: googleCheckoutBtnRef.current.parentElement?.clientWidth || 320,
+          })
+        } catch (e) {
+          console.error('Failed to initialize Google Sign-In on checkout:', e)
+        }
+      }
+    }
+
+    initGoogleGsiCheckout()
+
+    const interval = setInterval(() => {
+      if (typeof google !== 'undefined') {
+        initGoogleGsiCheckout()
+        clearInterval(interval)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated, showCheckoutAuthModal, signInWithGoogleIdToken])
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target
@@ -145,8 +202,9 @@ function CheckoutPage() {
     // Best-effort: record the order for the admin dashboard. Fire-and-forget so
     // it never blocks the order — the full order also reaches us via WhatsApp.
     if (isSupabaseConfigured) {
-      createOrder({
+      const orderPayload = {
         id: orderId,
+        userId: user?.id || null,
         customerName,
         customerEmail,
         customerPhone,
@@ -165,10 +223,17 @@ function CheckoutPage() {
           price: it.price,
           quantity: it.quantity,
         })),
-      }).catch((err) => {
-        console.error('Order save failed (order still sent via WhatsApp):', err)
-        showToast(humanizeError(err), 'error')
-      })
+      }
+
+      createOrder(orderPayload)
+        .then(() => {
+          // Trigger automated emails
+          sendOrderEmails(orderPayload)
+        })
+        .catch((err) => {
+          console.error('Order save failed (order still sent via WhatsApp):', err)
+          showToast(humanizeError(err), 'error')
+        })
     }
 
     // Open WhatsApp inside the gesture so iOS opens it reliably.
@@ -395,9 +460,15 @@ function CheckoutPage() {
               </div>
               <button
                 type="button"
-                onClick={() => placeOrder('bank_transfer')}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowCheckoutAuthModal(true)
+                  } else {
+                    placeOrder('bank_transfer')
+                  }
+                }}
                 disabled={submitting}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-5 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-brand-blue-deep disabled:opacity-60"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-5 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-brand-blue-deep disabled:opacity-60 cursor-pointer"
               >
                 <FaWhatsapp className="h-5 w-5" />
                 {submitting ? 'Confirming…' : "I've sent the money — confirm order"}
@@ -411,6 +482,56 @@ function CheckoutPage() {
           </aside>
         </form>
       </div>
+
+      {/* Checkout Auth Modal */}
+      {showCheckoutAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
+            <button
+              type="button"
+              onClick={() => {
+                setShowCheckoutAuthModal(false)
+                setAuthError(null)
+              }}
+              className="absolute right-4 top-4 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center">
+              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-blue-soft text-brand-blue">
+                <Lock className="h-5 w-5" />
+              </div>
+              <h3 className="mt-4 text-lg font-bold text-slate-900">
+                Sign in to order
+              </h3>
+              <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
+                Sign in to connect this order to your account for tracking across devices.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <div className="flex justify-center w-full min-h-[44px]">
+                <div ref={googleCheckoutBtnRef}></div>
+              </div>
+              
+              {authSubmitting && (
+                <p className="text-xs text-slate-500 animate-pulse">
+                  Please wait, authenticating…
+                </p>
+              )}
+
+              {authError && (
+                <div className="w-full rounded-xl bg-red-50 p-3 text-left text-xs text-red-700 text-center" role="alert">
+                  {authError}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

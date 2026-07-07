@@ -1,18 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ChevronRight, MessageSquareDashed, PenSquare, Quote, Star } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ChevronRight, MessageSquareDashed, PenSquare, Quote, Star, User } from 'lucide-react'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useApprovedReviews } from '../hooks/useReviews'
 import ReviewForm from '../components/ReviewForm'
-
-const AVATAR_POOL = [47, 12, 32, 8, 44, 23, 20, 15, 5, 33, 16, 25]
-
-function avatarFor(name) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0
-  const id = AVATAR_POOL[Math.abs(hash) % AVATAR_POOL.length]
-  return `https://i.pravatar.cc/120?img=${id}`
-}
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 
 function ReviewsPage() {
   useDocumentTitle(
@@ -20,7 +13,19 @@ function ReviewsPage() {
     "What customers say about Speedtouch's cleaning services in Ibadan, Lagos, Abuja and beyond.",
   )
   const { reviews, loading, refresh } = useApprovedReviews()
+  const { isAuthenticated } = useAuth()
+  const { showToast } = useCart()
+  const navigate = useNavigate()
   const [formOpen, setFormOpen] = useState(false)
+
+  const handleWriteReview = () => {
+    if (!isAuthenticated) {
+      showToast('Please sign in to leave a review.', 'error')
+      navigate('/account')
+      return
+    }
+    setFormOpen(true)
+  }
 
   const avg =
     reviews.length > 0
@@ -81,7 +86,7 @@ function ReviewsPage() {
           </div>
           <button
             type="button"
-            onClick={() => setFormOpen(true)}
+            onClick={handleWriteReview}
             className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
           >
             <PenSquare className="h-4 w-4" />
@@ -107,7 +112,7 @@ function ReviewsPage() {
             </p>
             <button
               type="button"
-              onClick={() => setFormOpen(true)}
+              onClick={handleWriteReview}
               className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
             >
               <PenSquare className="h-4 w-4" />
@@ -138,12 +143,9 @@ function ReviewsPage() {
                   "{r.comment}"
                 </p>
                 <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-4">
-                  <img
-                    src={avatarFor(r.name)}
-                    alt=""
-                    className="h-10 w-10 rounded-full object-cover"
-                    loading="lazy"
-                  />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                    <User className="h-6 w-6" />
+                  </div>
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-slate-900">
                       {r.name}

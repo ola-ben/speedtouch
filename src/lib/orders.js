@@ -54,6 +54,7 @@ export async function createOrder(payload) {
     shipping: payload.shipping,
     total: payload.total,
     status: payload.status ?? 'pending',
+    user_id: payload.userId ?? null,
     notes: payload.notes ?? null,
   })
   if (orderError) throw orderError
@@ -79,6 +80,17 @@ export async function fetchOrders() {
   const { data, error } = await supabase
     .from('orders')
     .select('*, order_items(*)')
+    .order('placed_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map(rowToOrder)
+}
+
+export async function fetchCustomerOrders(userId) {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, order_items(*)')
+    .eq('user_id', userId)
     .order('placed_at', { ascending: false })
   if (error) throw error
   return (data ?? []).map(rowToOrder)

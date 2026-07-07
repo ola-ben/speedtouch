@@ -84,11 +84,8 @@ function Products() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-wider text-brand-pink-deep">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-pink-deep">
               Our products
-            </span>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
-              Quality cleaning supplies, made for everyday use
             </h2>
           </div>
         </Reveal>

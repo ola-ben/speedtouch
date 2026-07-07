@@ -46,12 +46,7 @@ function Hero() {
 
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-5 text-center sm:px-6 md:pb-32 md:pt-5">
         <Reveal>
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-pink bg-white/80 px-3 py-1 text-xs font-medium text-brand-pink-deep backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-pink-deep" />
-            Trusted by 5,000+ homes
-          </span>
-
-          <h1 className="mt-5 text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 sm:text-6xl md:mt-8 md:text-7xl lg:text-8xl">
+          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl">
             A spotless home,
             <br />
             <em className="text-brand-blue">without the hassle</em>

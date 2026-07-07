@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom'
-import { CheckCircle2, Mail, Truck, Store, MapPin, PenSquare } from 'lucide-react'
+import { CheckCircle2, MessageSquare, Truck, Store, MapPin, PenSquare } from 'lucide-react'
 import { PICKUP_ADDRESS } from './CheckoutPage'
 
 function OrderConfirmationPage() {
@@ -19,16 +19,16 @@ function OrderConfirmationPage() {
         <p className="mt-3 text-slate-600">
           Your order{' '}
           <span className="font-semibold text-slate-900">#{orderId}</span> has been
-          placed. We've sent a confirmation to your email.
+          placed. Please save your order ID for your records.
         </p>
 
         <div className="mt-10 grid gap-4 rounded-2xl border border-slate-200 bg-white p-6 text-left sm:grid-cols-2">
           <div className="flex gap-3">
-            <Mail className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
+            <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-brand-blue" />
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">Order confirmation</h2>
+              <h2 className="text-sm font-semibold text-slate-900">WhatsApp Chat</h2>
               <p className="mt-1 text-xs text-slate-600">
-                A receipt is on the way to your inbox.
+                Your order receipt and details were shared in our WhatsApp chat.
               </p>
             </div>
           </div>

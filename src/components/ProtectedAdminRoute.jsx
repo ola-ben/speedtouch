@@ -2,7 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function ProtectedAdminRoute({ children }) {
-  const { isAuthenticated, loading, isSupabaseConfigured } = useAuth()
+  const { isAuthenticated, isAdmin, loading, isSupabaseConfigured } = useAuth()
   const location = useLocation()
 
   if (!isSupabaseConfigured) {
@@ -37,7 +37,7 @@ function ProtectedAdminRoute({ children }) {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !isAdmin) {
     return <Navigate to="/admin/login" replace state={{ from: location }} />
   }
 

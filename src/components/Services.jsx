@@ -6,6 +6,8 @@ import { useServices } from '../hooks/useServices'
 import { useApprovedReviews } from '../hooks/useReviews'
 import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 import ReviewForm from './ReviewForm'
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 
 function ExpandableText({ text, limit = 120, className = '' }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -44,11 +46,18 @@ function Services() {
   const [activeIdx, setActiveIdx] = useState(0)
   const { services, loading, error } = useServices()
   const { reviews, refresh: refreshReviews } = useApprovedReviews()
+  const { isAuthenticated } = useAuth()
+  const { showToast } = useCart()
   const [expandedReviews, setExpandedReviews] = useState({})
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
   const [selectedServiceForReview, setSelectedServiceForReview] = useState('')
 
   const handleOpenReviewModal = (serviceName) => {
+    if (!isAuthenticated) {
+      showToast('Please sign in to write a review.', 'error')
+      navigate('/account')
+      return
+    }
     setSelectedServiceForReview(serviceName)
     setReviewModalOpen(true)
   }
@@ -83,11 +92,8 @@ function Services() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-wider text-brand-pink-deep">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-pink-deep">
               Our services
-            </span>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
-              Pick the clean that fits your space
             </h2>
           </div>
         </Reveal>

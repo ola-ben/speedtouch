@@ -45,7 +45,6 @@ const cols = [
     title: 'Help',
     links: [
       { label: 'Contact', to: '/contact' },
-      { label: 'Pricing', to: '/pricing' },
       { label: 'Cancellation', to: '/cancellation' },
       { label: 'FAQ', to: '/faq' },
     ],

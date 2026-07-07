@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom'
 import { ShoppingBag } from 'lucide-react'
 import Logo from './Logo'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 const links = [
   { label: 'Home', to: '/' },
   { label: 'Services', to: '/services' },
   { label: 'Products', to: '/products' },
-  { label: 'Pricing', to: '/#pricing' },
+  { label: 'Our Work', to: '/work' },
   { label: 'Contact', to: '/#contact' },
 ]
 
@@ -16,6 +17,7 @@ function Header() {
   const [open, setOpen] = useState(false)
   const closeOnClick = () => setOpen(false)
   const { count, openDrawer } = useCart()
+  const { isAuthenticated } = useAuth()
 
   const CartButton = ({ className = '' }) => (
     <button
@@ -48,6 +50,12 @@ function Header() {
               {l.label}
             </Link>
           ))}
+          <Link
+            to="/account"
+            className="text-sm font-medium text-slate-600 transition hover:text-brand-blue"
+          >
+            {isAuthenticated ? 'My Account' : 'Sign In'}
+          </Link>
         </nav>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -87,6 +95,13 @@ function Header() {
                 {l.label}
               </Link>
             ))}
+            <Link
+              to="/account"
+              onClick={closeOnClick}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-pink-soft hover:text-brand-blue"
+            >
+              {isAuthenticated ? 'My Account' : 'Sign In'}
+            </Link>
             <Link
               to="/#book"
               onClick={closeOnClick}

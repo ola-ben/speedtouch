@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ChevronRight, Star, PenSquare, Quote, MessageSquareDashed, ShieldCheck, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { ChevronRight, Star, PenSquare, Quote, MessageSquareDashed, ShieldCheck, Clock, User } from 'lucide-react'
 import { useServices } from '../hooks/useServices'
 import { useApprovedReviews } from '../hooks/useReviews'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 import ReviewForm from '../components/ReviewForm'
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
 
 function NotFound() {
   return (
@@ -53,20 +55,23 @@ const bookingLink = (service) => {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
 }
 
-const AVATAR_POOL = [47, 12, 32, 8, 44, 23, 20, 15, 5, 33, 16, 25]
-
-function avatarFor(name) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0
-  const id = AVATAR_POOL[Math.abs(hash) % AVATAR_POOL.length]
-  return `https://i.pravatar.cc/120?img=${id}`
-}
-
 function ServiceDetailPage() {
   const { id } = useParams()
   const { services, loading: servicesLoading } = useServices()
   const { reviews, loading: reviewsLoading, refresh: refreshReviews } = useApprovedReviews()
+  const { isAuthenticated } = useAuth()
+  const { showToast } = useCart()
+  const navigate = useNavigate()
   const [formOpen, setFormOpen] = useState(false)
+
+  const handleWriteReview = () => {
+    if (!isAuthenticated) {
+      showToast('Please sign in to write a review.', 'error')
+      navigate('/account')
+      return
+    }
+    setFormOpen(true)
+  }
 
   const service = services.find((s) => s.id === id)
 
@@ -241,7 +246,7 @@ function ServiceDetailPage() {
 
             <button
               type="button"
-              onClick={() => setFormOpen(true)}
+              onClick={handleWriteReview}
               className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
             >
               <PenSquare className="h-4 w-4" />
@@ -266,7 +271,7 @@ function ServiceDetailPage() {
               </p>
               <button
                 type="button"
-                onClick={() => setFormOpen(true)}
+                onClick={handleWriteReview}
                 className="mt-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:border-brand-blue hover:text-brand-blue transition"
               >
                 Write the first review
@@ -298,12 +303,9 @@ function ServiceDetailPage() {
                   </div>
 
                   <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-4">
-                    <img
-                      src={avatarFor(r.name)}
-                      alt=""
-                      className="h-9 w-9 rounded-full object-cover"
-                      loading="lazy"
-                    />
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                      <User className="h-5 w-5" />
+                    </div>
                     <div>
                       <div className="text-xs font-semibold text-slate-900">{r.name}</div>
                       {r.location && <div className="text-[10px] text-slate-400">{r.location}</div>}

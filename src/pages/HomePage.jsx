@@ -2,6 +2,7 @@ import Hero from '../components/Hero'
 import Marquee from '../components/Marquee'
 import Services from '../components/Services'
 import Products from '../components/Products'
+import WorkShowcase from '../components/WorkShowcase'
 import Co from '../components/Co'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
@@ -17,6 +18,7 @@ function HomePage() {
       <Marquee />
       <Products />
       <Services />
+      <WorkShowcase />
       <Co />
     </>
   )

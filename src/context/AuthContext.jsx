@@ -29,10 +29,84 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }, [])
 
+  const signUp = useCallback(async (email, password, metadata = {}) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
+    }
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    })
+    if (error) throw error
+    return data
+  }, [])
+
+  const signInWithGoogle = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/account',
+      },
+    })
+    if (error) throw error
+  }, [])
+
+  const signInWithGoogleIdToken = useCallback(async (idToken) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
+    }
+    const { error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: idToken,
+    })
+    if (error) throw error
+  }, [])
+
+  const sendOtp = useCallback(async (email, metadata = {}) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
+    }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + '/account',
+        data: metadata,
+      },
+    })
+    if (error) throw error
+  }, [])
+
+  const verifyOtp = useCallback(async (email, token) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
+    }
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    })
+    if (error) throw error
+    return data
+  }, [])
+
   const signOut = useCallback(async () => {
     if (!isSupabaseConfigured) return
     await supabase.auth.signOut()
   }, [])
+
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'info@speedtouch.com.ng')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+
+  const isAdmin = Boolean(
+    user && user.email && adminEmails.includes(user.email.toLowerCase())
+  )
 
   return (
     <AuthContext.Provider
@@ -40,8 +114,14 @@ export function AuthProvider({ children }) {
         user,
         loading,
         signIn,
+        signUp,
+        signInWithGoogle,
+        signInWithGoogleIdToken,
+        sendOtp,
+        verifyOtp,
         signOut,
         isAuthenticated: Boolean(user),
+        isAdmin,
         isSupabaseConfigured,
       }}
     >
