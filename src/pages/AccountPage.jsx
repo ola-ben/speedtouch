@@ -18,14 +18,45 @@ const STATUS_CLASSES = {
 function AccountPage() {
   useDocumentTitle('My Account', 'Sign up, sign in, or track your orders with Speedtouch.')
   
-  const { user, signInWithGoogleIdToken, signOut, isAuthenticated, isSupabaseConfigured } = useAuth()
+  const { user, sendOtp, verifyOtp, signInWithGoogleIdToken, signOut, isAuthenticated, isSupabaseConfigured } = useAuth()
   const navigate = useNavigate()
   
   // Auth State
   const [authError, setAuthError] = useState(null)
   const [authSubmitting, setAuthSubmitting] = useState(false)
+  const [email, setEmail] = useState('')
+  const [otpToken, setOtpToken] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
   
   const googleBtnRef = useRef(null)
+  const otpInputRef = useRef(null)
+
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault()
+    setAuthError(null)
+    setAuthSubmitting(true)
+    try {
+      await sendOtp(email)
+      setOtpSent(true)
+    } catch (err) {
+      setAuthError(err.message || 'Failed to send verification code.')
+    } finally {
+      setAuthSubmitting(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault()
+    setAuthError(null)
+    setAuthSubmitting(true)
+    try {
+      await verifyOtp(email, otpToken)
+    } catch (err) {
+      setAuthError(err.message || 'Invalid or expired code. Please try again.')
+    } finally {
+      setAuthSubmitting(false)
+    }
+  }
   
   // Order History State
   const [orders, setOrders] = useState([])
@@ -100,7 +131,7 @@ function AccountPage() {
     }, 500)
 
     return () => clearInterval(interval)
-  }, [isAuthenticated, signInWithGoogleIdToken])
+  }, [isAuthenticated, signInWithGoogleIdToken, otpSent])
 
   const toggleOrder = (orderId) => {
     setExpandedOrders((prev) => ({
@@ -123,7 +154,7 @@ function AccountPage() {
     )
   }
 
-  // Unauthenticated: Sign In or Register Form
+  // Unauthenticated: OTP Sign In Form
   if (!isAuthenticated) {
     return (
       <section className="flex min-h-[75vh] items-center justify-center bg-slate-50/60 px-4 py-12">
@@ -132,29 +163,138 @@ function AccountPage() {
             <Lock className="h-5 w-5" />
           </div>
           <h1 className="mt-5 text-center text-2xl font-semibold tracking-tight text-slate-900">
-            Sign in to your account
+            {otpSent ? 'Verify your email' : 'Sign in or register'}
           </h1>
-          <p className="mt-2 text-center text-xs text-slate-500">
-            Access your order history and details across all your devices using Google Sign-In.
+          <p className="mt-2 text-center text-xs text-slate-500 leading-relaxed">
+            {otpSent
+              ? `We sent a 6-digit verification code to ${email}`
+              : 'Enter your email to receive a secure one-time passcode.'}
           </p>
 
-          <div className="mt-6 flex flex-col items-center gap-4">
-            <div className="flex justify-center w-full min-h-[44px]">
-              <div ref={googleBtnRef}></div>
-            </div>
-            
-            {authSubmitting && (
-              <p className="text-xs text-slate-500 animate-pulse">
-                Please wait, authenticating…
-              </p>
-            )}
+          {!otpSent ? (
+            <>
+              <form onSubmit={handleSendOtp} className="mt-6 space-y-4">
+                <label className="block text-sm">
+                  <span className="text-xs font-medium text-slate-700">Email address</span>
+                  <input
+                    type="email"
+                    required
+                    placeholder="your email address"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+                  />
+                </label>
 
-            {authError && (
-              <div className="w-full rounded-xl bg-red-50 p-3 text-xs text-red-700 text-center" role="alert">
-                {authError}
+                {authError && (
+                  <div className="w-full rounded-xl bg-red-50 p-3 text-xs text-red-700 text-center" role="alert">
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={authSubmitting || !isSupabaseConfigured}
+                  className="w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                >
+                  {authSubmitting ? 'Sending code…' : 'Send verification code'}
+                </button>
+              </form>
+
+              <div className="relative my-6 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-100"></div>
+                </div>
+                <span className="relative bg-white px-3 text-xs text-slate-400 font-medium">
+                  Or continue with
+                </span>
               </div>
-            )}
-          </div>
+
+              <div className="flex justify-center w-full min-h-[44px]">
+                <div ref={googleBtnRef}></div>
+              </div>
+            </>
+          ) : (
+            <>
+              <form onSubmit={handleVerifyOtp} className="mt-6 space-y-4">
+                <div className="block text-sm">
+                  <span className="text-xs font-medium text-slate-700 block text-center mb-3">Enter 6-Digit Code</span>
+                  <div 
+                    onClick={() => otpInputRef.current?.focus()}
+                    className="relative flex justify-center gap-2.5 cursor-pointer py-1"
+                  >
+                    {[0, 1, 2, 3, 4, 5].map((index) => {
+                      const char = otpToken[index] || '0'
+                      const isTyped = index < otpToken.length
+                      const isCurrent = index === otpToken.length
+                      return (
+                        <div
+                          key={index}
+                          className={`w-11 h-12 rounded-xl border flex items-center justify-center text-lg font-bold transition-all duration-150 ${
+                            isTyped 
+                              ? 'border-brand-blue bg-white text-slate-900 shadow-sm ring-1 ring-brand-blue/10' 
+                              : isCurrent
+                                ? 'border-brand-blue bg-white text-slate-300 ring-2 ring-brand-blue/20 animate-pulse'
+                                : 'border-slate-200 bg-slate-50 text-slate-300'
+                          }`}
+                        >
+                          {char}
+                        </div>
+                      )
+                    })}
+                    <input
+                      ref={otpInputRef}
+                      type="text"
+                      required
+                      maxLength={6}
+                      pattern="[0-9]*"
+                      inputMode="numeric"
+                      value={otpToken}
+                      onChange={(e) => setOtpToken(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  </div>
+                </div>
+
+                {authError && (
+                  <div className="w-full rounded-xl bg-red-50 p-3 text-xs text-red-700 text-center" role="alert">
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={authSubmitting}
+                  className="w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                >
+                  {authSubmitting ? 'Verifying…' : 'Verify & Sign In'}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center flex flex-col gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => handleSendOtp(null)}
+                  disabled={authSubmitting}
+                  className="text-xs font-medium text-brand-blue hover:underline cursor-pointer disabled:opacity-50"
+                >
+                  Resend verification code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpSent(false)
+                    setOtpToken('')
+                    setAuthError(null)
+                  }}
+                  className="text-xs font-medium text-slate-500 hover:underline cursor-pointer"
+                >
+                  Change email address
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </section>
     )

@@ -40,7 +40,7 @@ function loadSavedCheckout() {
 
 function CheckoutPage() {
   const { items, count, subtotal, clearCart, showToast } = useCart()
-  const { user, isAuthenticated, signInWithGoogleIdToken } = useAuth()
+  const { user, isAuthenticated, sendOtp, verifyOtp, signInWithGoogleIdToken } = useAuth()
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
@@ -50,6 +50,39 @@ function CheckoutPage() {
   const [showCheckoutAuthModal, setShowCheckoutAuthModal] = useState(false)
   const [authError, setAuthError] = useState(null)
   const [authSubmitting, setAuthSubmitting] = useState(false)
+  
+  const [authEmail, setAuthEmail] = useState('')
+  const [authOtpToken, setAuthOtpToken] = useState('')
+  const [authOtpSent, setAuthOtpSent] = useState(false)
+
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault()
+    setAuthError(null)
+    setAuthSubmitting(true)
+    try {
+      await sendOtp(authEmail)
+      setAuthOtpSent(true)
+    } catch (err) {
+      setAuthError(err.message || 'Failed to send verification code.')
+    } finally {
+      setAuthSubmitting(false)
+    }
+  }
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault()
+    setAuthError(null)
+    setAuthSubmitting(true)
+    try {
+      await verifyOtp(authEmail, authOtpToken)
+      setShowCheckoutAuthModal(false)
+      showToast('Signed in successfully!', 'success')
+    } catch (err) {
+      setAuthError(err.message || 'Invalid or expired code. Please try again.')
+    } finally {
+      setAuthSubmitting(false)
+    }
+  }
   
   const [formData, setFormData] = useState(() => {
     const saved = loadSavedCheckout()
@@ -67,6 +100,22 @@ function CheckoutPage() {
   })
 
   const googleCheckoutBtnRef = useRef(null)
+  const authOtpInputRef = useRef(null)
+
+  // Auto-fill logged-in user's email
+  useEffect(() => {
+    if (isAuthenticated && user?.email && !formData.email) {
+      setFormData((prev) => {
+        const updated = { ...prev, email: user.email }
+        try {
+          localStorage.setItem(SAVED_CHECKOUT_KEY, JSON.stringify(updated))
+        } catch {
+          // ignore
+        }
+        return updated
+      })
+    }
+  }, [isAuthenticated, user, formData.email])
 
   useEffect(() => {
     if (isAuthenticated || !showCheckoutAuthModal) return
@@ -113,7 +162,7 @@ function CheckoutPage() {
     }, 500)
 
     return () => clearInterval(interval)
-  }, [isAuthenticated, showCheckoutAuthModal, signInWithGoogleIdToken])
+  }, [isAuthenticated, showCheckoutAuthModal, signInWithGoogleIdToken, authOtpSent])
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target
@@ -492,6 +541,9 @@ function CheckoutPage() {
               onClick={() => {
                 setShowCheckoutAuthModal(false)
                 setAuthError(null)
+                setAuthEmail('')
+                setAuthOtpToken('')
+                setAuthOtpSent(false)
               }}
               className="absolute right-4 top-4 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             >
@@ -505,30 +557,139 @@ function CheckoutPage() {
                 <Lock className="h-5 w-5" />
               </div>
               <h3 className="mt-4 text-lg font-bold text-slate-900">
-                Sign in to order
+                {authOtpSent ? 'Verify your email' : 'Sign in to order'}
               </h3>
               <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">
-                Sign in to connect this order to your account for tracking across devices.
+                {authOtpSent 
+                  ? `We sent a 6-digit verification code to ${authEmail}`
+                  : 'Enter your email to receive a secure one-time passcode.'}
               </p>
             </div>
 
-            <div className="mt-6 flex flex-col items-center gap-4">
-              <div className="flex justify-center w-full min-h-[44px]">
-                <div ref={googleCheckoutBtnRef}></div>
-              </div>
-              
-              {authSubmitting && (
-                <p className="text-xs text-slate-500 animate-pulse">
-                  Please wait, authenticating…
-                </p>
-              )}
+            {!authOtpSent ? (
+              <>
+                <form onSubmit={handleSendOtp} className="mt-6 space-y-4">
+                  <label className="block text-sm">
+                    <span className="text-xs font-medium text-slate-700">Email address</span>
+                    <input
+                      type="email"
+                      required
+                      placeholder="your email address"
+                      autoComplete="email"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+                    />
+                  </label>
 
-              {authError && (
-                <div className="w-full rounded-xl bg-red-50 p-3 text-left text-xs text-red-700 text-center" role="alert">
-                  {authError}
+                  {authError && (
+                    <div className="w-full rounded-xl bg-red-50 p-3 text-xs text-red-700 text-center" role="alert">
+                      {authError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={authSubmitting}
+                    className="w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {authSubmitting ? 'Sending code…' : 'Send verification code'}
+                  </button>
+                </form>
+
+                <div className="relative my-6 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-100"></div>
+                  </div>
+                  <span className="relative bg-white px-3 text-xs text-slate-400 font-medium">
+                    Or continue with
+                  </span>
                 </div>
-              )}
-            </div>
+
+                <div className="flex justify-center w-full min-h-[44px]">
+                  <div ref={googleCheckoutBtnRef}></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <form onSubmit={handleVerifyOtp} className="mt-6 space-y-4">
+                  <div className="block text-sm">
+                    <span className="text-xs font-medium text-slate-700 block text-center mb-3">Enter 6-Digit Code</span>
+                    <div 
+                      onClick={() => authOtpInputRef.current?.focus()}
+                      className="relative flex justify-center gap-2.5 cursor-pointer py-1"
+                    >
+                      {[0, 1, 2, 3, 4, 5].map((index) => {
+                        const char = authOtpToken[index] || '0'
+                        const isTyped = index < authOtpToken.length
+                        const isCurrent = index === authOtpToken.length
+                        return (
+                          <div
+                            key={index}
+                            className={`w-11 h-12 rounded-xl border flex items-center justify-center text-lg font-bold transition-all duration-150 ${
+                              isTyped 
+                                ? 'border-brand-blue bg-white text-slate-900 shadow-sm ring-1 ring-brand-blue/10' 
+                                : isCurrent
+                                  ? 'border-brand-blue bg-white text-slate-300 ring-2 ring-brand-blue/20 animate-pulse'
+                                  : 'border-slate-200 bg-slate-50 text-slate-300'
+                            }`}
+                          >
+                            {char}
+                          </div>
+                        )
+                      })}
+                      <input
+                        ref={authOtpInputRef}
+                        type="text"
+                        required
+                        maxLength={6}
+                        pattern="[0-9]*"
+                        inputMode="numeric"
+                        value={authOtpToken}
+                        onChange={(e) => setAuthOtpToken(e.target.value.replace(/[^0-9]/g, ''))}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                    </div>
+                  </div>
+
+                  {authError && (
+                    <div className="w-full rounded-xl bg-red-50 p-3 text-xs text-red-700 text-center" role="alert">
+                      {authError}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={authSubmitting}
+                    className="w-full rounded-full bg-brand-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {authSubmitting ? 'Verifying…' : 'Verify & Sign In'}
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center flex flex-col gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSendOtp(null)}
+                    disabled={authSubmitting}
+                    className="text-xs font-medium text-brand-blue hover:underline cursor-pointer disabled:opacity-50"
+                  >
+                    Resend verification code
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthOtpSent(false)
+                      setAuthOtpToken('')
+                      setAuthError(null)
+                    }}
+                    className="text-xs font-medium text-slate-500 hover:underline cursor-pointer"
+                  >
+                    Change email address
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
