@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import StockBar from './StockBar'
 import { useProducts } from '../hooks/useProducts'
+import ImageWithLoader from './ImageWithLoader'
 
 const naira = (n) => `₦${Number(n).toLocaleString('en-NG')}`
 
@@ -14,11 +15,11 @@ function ProductCard({ product }) {
         to={`/products/${product.id}`}
         className="relative block aspect-[5/4] overflow-hidden bg-slate-100"
       >
-        <img
+        <ImageWithLoader
           src={product.image}
           alt={product.name}
-          loading="lazy"
-          className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
+          className="h-full w-full"
+          imgClassName={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
             soldOut ? 'opacity-60 grayscale' : ''
           }`}
         />

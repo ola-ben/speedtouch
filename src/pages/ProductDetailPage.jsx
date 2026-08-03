@@ -4,6 +4,7 @@ import { ChevronRight, Star, Plus, Minus, ShieldCheck, Truck, RotateCcw } from '
 import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
+import ImageWithLoader from '../components/ImageWithLoader'
 
 function NotFound() {
   return (
@@ -76,12 +77,13 @@ function ProductDetailPage() {
         <div className="mt-6 grid gap-8 md:grid-cols-2 md:gap-12">
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
             <div className="relative aspect-square">
-              <img
+              <ImageWithLoader
                 src={product.image}
                 alt={product.name}
+                className="h-full w-full"
+                imgClassName="h-full w-full object-cover"
                 fetchPriority="high"
                 decoding="async"
-                className="h-full w-full object-cover"
               />
               {product.discount > 0 && (
                 <span className="absolute right-4 top-4 rounded bg-brand-pink-soft px-2 py-1 text-xs font-bold text-brand-pink-deep">
@@ -216,11 +218,11 @@ function ProductDetailPage() {
                   className="group flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-brand-blue/40 hover:shadow-md hover:shadow-brand-blue/5"
                 >
                   <div className="relative aspect-square overflow-hidden bg-slate-100">
-                    <img
+                    <ImageWithLoader
                       src={p.image}
                       alt={p.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      className="h-full w-full"
+                      imgClassName="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                     <span className="absolute right-1.5 top-1.5 rounded bg-brand-pink-soft px-1.5 py-0.5 text-[10px] font-bold text-brand-pink-deep">
                       -{p.discount}%

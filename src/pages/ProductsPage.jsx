@@ -6,6 +6,7 @@ import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import StockBar from '../components/StockBar'
+import ImageWithLoader from '../components/ImageWithLoader'
 
 function ProductsPage() {
   const [category, setCategory] = useState('all')
@@ -262,11 +263,11 @@ function ProductsPage() {
                   to={`/products/${p.id}`}
                   className="relative block aspect-[5/4] overflow-hidden bg-slate-100"
                 >
-                  <img
+                  <ImageWithLoader
                     src={p.image}
                     alt={p.name}
-                    loading="lazy"
-                    className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
+                    className="h-full w-full"
+                    imgClassName={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${
                       p.stock === 0 ? 'opacity-60 grayscale' : ''
                     }`}
                   />

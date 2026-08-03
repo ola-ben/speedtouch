@@ -8,6 +8,7 @@ import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 import ReviewForm from './ReviewForm'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import ImageWithLoader from './ImageWithLoader'
 
 function ExpandableText({ text, limit = 120, className = '' }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -172,11 +173,11 @@ function Services() {
                     >
                       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                         {s.image && (
-                          <img
+                          <ImageWithLoader
                             src={s.image}
                             alt={s.name}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                            className="h-full w-full"
+                            imgClassName="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                           />
                         )}
                         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-brand-pink-deep backdrop-blur">

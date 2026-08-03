@@ -8,6 +8,7 @@ import { WHATSAPP_NUMBER } from '../lib/whatsapp'
 import ReviewForm from '../components/ReviewForm'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import ImageWithLoader from '../components/ImageWithLoader'
 
 function NotFound() {
   return (
@@ -124,10 +125,11 @@ function ServiceDetailPage() {
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
             <div className="relative aspect-4/3">
               {service.image ? (
-                <img
+                <ImageWithLoader
                   src={service.image}
                   alt={service.name}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full"
+                  imgClassName="h-full w-full object-cover"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-slate-100 text-slate-400">
