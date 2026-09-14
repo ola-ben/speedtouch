@@ -1,3 +1,5 @@
+'use client'
+
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import StockBar from './StockBar'
@@ -6,11 +8,17 @@ import ImageWithLoader from './ImageWithLoader'
 
 const naira = (n) => `₦${Number(n).toLocaleString('en-NG')}`
 
+import { motion } from 'framer-motion'
+
 function ProductCard({ product }) {
   const soldOut = product.stock === 0
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-1">
+    <motion.article
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition-shadow hover:shadow-lg"
+    >
       <Link
         to={`/products/${product.id}`}
         className="relative block aspect-[5/4] overflow-hidden bg-slate-100"
@@ -58,7 +66,7 @@ function ProductCard({ product }) {
 
         <StockBar stock={product.stock} />
       </div>
-    </article>
+    </motion.article>
   )
 }
 

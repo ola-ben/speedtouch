@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
@@ -17,6 +19,7 @@ export function AuthProvider({ children }) {
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      setLoading(false)
     })
     return () => sub.subscription.unsubscribe()
   }, [])
@@ -25,8 +28,13 @@ export function AuthProvider({ children }) {
     if (!isSupabaseConfigured) {
       throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env.')
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+    if (data?.user) {
+      setUser(data.user)
+      setLoading(false)
+    }
+    return data
   }, [])
 
   const signUp = useCallback(async (email, password, metadata = {}) => {
@@ -97,15 +105,35 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     if (!isSupabaseConfigured) return
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      setUser(null)
+      setLoading(false)
+    }
   }, [])
 
-  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'info@speedtouch.com.ng')
+  const rawAdminEmails =
+    (typeof process !== 'undefined' &&
+      (process.env.NEXT_PUBLIC_ADMIN_EMAILS ||
+        process.env.VITE_ADMIN_EMAILS ||
+        process.env.VITE_ADMIN_EMAIL)) ||
+    (typeof import.meta !== 'undefined' &&
+      (import.meta.env?.VITE_ADMIN_EMAILS || import.meta.env?.VITE_ADMIN_EMAIL)) ||
+    'speedtouch@gmail.com'
+
+  const adminEmails = String(rawAdminEmails)
     .split(',')
     .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+
+  const hasAdminMetadata =
+    user?.app_metadata?.role === 'admin' ||
+    user?.user_metadata?.role === 'admin' ||
+    user?.user_metadata?.is_admin === true
 
   const isAdmin = Boolean(
-    user && user.email && adminEmails.includes(user.email.toLowerCase())
+    user && (hasAdminMetadata || (user.email && adminEmails.includes(user.email.toLowerCase())))
   )
 
   return (

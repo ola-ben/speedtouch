@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useReducer, useState } from 'react'
 
 const CartContext = createContext(null)

@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Star, X } from 'lucide-react'
 import { submitReview } from '../lib/reviews'

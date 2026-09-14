@@ -64,17 +64,17 @@ _React · Express · Supabase · PostgreSQL · Vercel · Render_
 - Implemented **Framer Motion** micro-interactions, mobile-first responsive design (5-tab bottom nav / desktop top nav), JWT-based RBAC via `app_metadata.role`, and a custom animated toast system using `useToaster()`.
 - Wrote a layered Express backend (`routes → middleware → controllers → db`) with helmet, CORS allow-listing, and centralized error handling — deployed via GitHub auto-deploys.
 
-### Speedtouch — Full-stack e-commerce platform for a Nigerian cleaning service
+### Speedtouch — Full-stack e-commerce, service booking & admin platform
 
-**[speedtouch-virid.vercel.app](https://speedtouch-virid.vercel.app)**
-_React 19 · Vite · Tailwind CSS v4 · React Router 7 · Supabase (Auth, Postgres, Storage, RLS, triggers) · Paystack · Lucide / React Icons · vite-plugin-pwa · IntersectionObserver_
+**[speedtouch.com.ng](https://speedtouch.com.ng)** · [github.com/ola-ben/speedtouch](https://github.com/ola-ben/speedtouch)
+_Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · Framer Motion · Supabase (Auth, Postgres RLS, Storage) · Paystack · Google Schema.org · PWA · Apache cPanel_
 
-- Shipped a complete storefront end-to-end: marketing home with services + Jumia-style product strip in NGN (`toLocaleString('en-NG')`), full `/products` listing with category filters & search, `/products/:id` detail with related items, slide-out cart drawer with `localStorage` persistence, **delivery-vs-pickup** checkout, order confirmation, and a protected `/admin` surface — all behind `React.lazy` + `<Suspense>` with hash-aware `<ScrollToTop>` for cross-route navigation.
-- Built the **admin dashboard** (Overview, Orders, Customers, Products, Services, Settings) behind a Supabase Auth gate with a sticky sidebar layout — revenue + order stat cards, low-stock alerts, image-upload forms wired to dedicated `product-images` / `service-images` storage buckets, and a per-order status dropdown that writes back to Postgres on change.
-- Designed the **Postgres schema** (products, services, orders, order_items) with split Row Level Security — public anonymous reads, anonymous order inserts, authenticated-only admin reads/updates — plus a `SECURITY DEFINER` trigger that **atomically decrements product stock** on every `order_items` insert (clamped at zero) so the front-end's stock-progress bars and "Sold out" overlays stay synced with the database.
-- Integrated **Paystack** payments via the inline popup with a promise-based wrapper (NGN→kobo conversion, resolves on success / rejects on customer-close); order rows only commit to Postgres after a successful charge so cancelled payments never pollute the orders table — and the Paystack reference round-trips from the client into Postgres and surfaces on the admin order detail.
-- Designed a **cinematic hero** with an autoplaying CC0 video (Mixkit, hotlink-friendly) + `onError` poster fallback, a mobile-first **swipe carousel** (`snap-x snap-mandatory`, live `1 / 6` index counter driven by `onScroll` distance-from-center math), CSS-keyframed marquee, and `<Reveal>` entrance animations that respect `prefers-reduced-motion` and skip below `sm`.
-- Made the site an **installable PWA** with `vite-plugin-pwa` (autoUpdate service worker, Workbox precache, `navigateFallbackDenylist` to stop SW from intercepting `/assets/*` chunks), a **platform-aware Install button** (`beforeinstallprompt` for Android/Chrome, share-sheet modal for iOS Safari), and tuned **Vercel** deploy with SPA rewrites + 1-year `Cache-Control: immutable` on hashed assets and `must-revalidate` on `index.html` / `sw.js`.
+- Shipped a complete commercial cleaning & eco-supplies platform end-to-end: marketing showcase, service booking, dynamic catalog with category filtering & search, spring-animated cart drawer with `localStorage` persistence, flexible checkout (delivery vs station pickup), and 1-click WhatsApp order confirmation with formatted receipts.
+- Built a **hardened admin portal** (/admin) with Supabase RBAC, custom admin email whitelisting, protected routing eliminating redirect loops, revenue & order stat cards, low-stock notifications, image uploads to Supabase Storage, and live order status toggling.
+- Architected for **Google Mobile Sitelinks & SEO**: configured Next.js App Router dynamic sitemaps (`sitemap.js`), robots rules (`robots.js`), and Schema.org structured data (`LocalBusiness`, `Product`, `Service`, and `WebSite` navigation elements).
+- Implemented modern **Framer Motion** micro-interactions: spring-slide cart drawer, staggered FAQ accordions with rotating glyphs, animated hamburger navigation, and card hover elevations.
+- Designed database schema in **PostgreSQL with Row Level Security (RLS)**: public anonymous reads for products/services, anonymous order inserts, and authenticated-only admin operations with atomic stock decrements via `SECURITY DEFINER` triggers.
+- Optimized deployment for **cPanel Apache**: engineered automatic cache-busting via content hashing, `max-age=0, must-revalidate` headers on HTML pages in `.htaccess`, and dual packaging for both Next.js and Vite PWA pipelines.
 
 ---
 

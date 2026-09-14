@@ -1,3 +1,5 @@
+'use client'
+
 const items = [
   'Standard Clean',
   'Deep Clean',

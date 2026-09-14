@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import {
@@ -74,7 +76,7 @@ function SidebarContent({ onNavigate }) {
   )
 }
 
-function AdminLayout() {
+function AdminLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { user, signOut } = useAuth()
   const initial = user?.email?.[0]?.toUpperCase() ?? 'A'
@@ -159,7 +161,7 @@ function AdminLayout() {
         </header>
 
         <main className="flex-1">
-          <Outlet />
+          {children || <Outlet />}
         </main>
       </div>
     </div>

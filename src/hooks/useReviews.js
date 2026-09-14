@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 import { fetchAllReviews, fetchApprovedReviews } from '../lib/reviews'
 

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import HomePage from './pages/HomePage'
+import HomePage from './views/HomePage'
 import ScrollToTop from './components/ScrollToTop'
 import InstallPrompt from './components/InstallPrompt'
 import CartDrawer from './components/CartDrawer'
@@ -12,36 +12,36 @@ import AdminLayout from './components/admin/AdminLayout'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 
-const TermsPage = lazy(() => import('./pages/TermsPage'))
-const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
-const WorkPage = lazy(() => import('./pages/WorkPage'))
-const ProductsPage = lazy(() => import('./pages/ProductsPage'))
-const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'))
-const ServicesPage = lazy(() => import('./pages/ServicesPage'))
-const ServiceDetailPage = lazy(() => import('./pages/ServiceDetailPage'))
-const CartPage = lazy(() => import('./pages/CartPage'))
-const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
-const AccountPage = lazy(() => import('./pages/AccountPage'))
-const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
-const AboutPage = lazy(() => import('./pages/AboutPage'))
-const ReviewsPage = lazy(() => import('./pages/ReviewsPage'))
-const ContactPage = lazy(() => import('./pages/ContactPage'))
-const PricingPage = lazy(() => import('./pages/PricingPage'))
-const CancellationPage = lazy(() => import('./pages/CancellationPage'))
-const FAQPage = lazy(() => import('./pages/FAQPage'))
-const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
-const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'))
-const AdminProductFormPage = lazy(() => import('./pages/admin/AdminProductFormPage'))
-const AdminServicesPage = lazy(() => import('./pages/admin/AdminServicesPage'))
-const AdminServiceFormPage = lazy(() => import('./pages/admin/AdminServiceFormPage'))
-const AdminReviewsPage = lazy(() => import('./pages/admin/AdminReviewsPage'))
-const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'))
-const AdminOrderDetailPage = lazy(() => import('./pages/admin/AdminOrderDetailPage'))
-const AdminCustomersPage = lazy(() => import('./pages/admin/AdminCustomersPage'))
-const AdminCustomerDetailPage = lazy(() => import('./pages/admin/AdminCustomerDetailPage'))
-const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'))
+const TermsPage = lazy(() => import('./views/TermsPage'))
+const PrivacyPage = lazy(() => import('./views/PrivacyPage'))
+const NotFoundPage = lazy(() => import('./views/NotFoundPage'))
+const WorkPage = lazy(() => import('./views/WorkPage'))
+const ProductsPage = lazy(() => import('./views/ProductsPage'))
+const ProductDetailPage = lazy(() => import('./views/ProductDetailPage'))
+const ServicesPage = lazy(() => import('./views/ServicesPage'))
+const ServiceDetailPage = lazy(() => import('./views/ServiceDetailPage'))
+const CartPage = lazy(() => import('./views/CartPage'))
+const CheckoutPage = lazy(() => import('./views/CheckoutPage'))
+const AccountPage = lazy(() => import('./views/AccountPage'))
+const OrderConfirmationPage = lazy(() => import('./views/OrderConfirmationPage'))
+const AboutPage = lazy(() => import('./views/AboutPage'))
+const ReviewsPage = lazy(() => import('./views/ReviewsPage'))
+const ContactPage = lazy(() => import('./views/ContactPage'))
+const PricingPage = lazy(() => import('./views/PricingPage'))
+const CancellationPage = lazy(() => import('./views/CancellationPage'))
+const FAQPage = lazy(() => import('./views/FAQPage'))
+const AdminLoginPage = lazy(() => import('./views/admin/AdminLoginPage'))
+const AdminDashboardPage = lazy(() => import('./views/admin/AdminDashboardPage'))
+const AdminProductsPage = lazy(() => import('./views/admin/AdminProductsPage'))
+const AdminProductFormPage = lazy(() => import('./views/admin/AdminProductFormPage'))
+const AdminServicesPage = lazy(() => import('./views/admin/AdminServicesPage'))
+const AdminServiceFormPage = lazy(() => import('./views/admin/AdminServiceFormPage'))
+const AdminReviewsPage = lazy(() => import('./views/admin/AdminReviewsPage'))
+const AdminOrdersPage = lazy(() => import('./views/admin/AdminOrdersPage'))
+const AdminOrderDetailPage = lazy(() => import('./views/admin/AdminOrderDetailPage'))
+const AdminCustomersPage = lazy(() => import('./views/admin/AdminCustomersPage'))
+const AdminCustomerDetailPage = lazy(() => import('./views/admin/AdminCustomerDetailPage'))
+const AdminSettingsPage = lazy(() => import('./views/admin/AdminSettingsPage'))
 
 function PageLoader() {
   return (

@@ -22,8 +22,8 @@
   <FilesMatch "\.(js|css|woff2?|ttf|svg|png|jpe?g|webp|avif|mp4)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
-  # The app shell + service worker must always revalidate (overrides the above)
-  <FilesMatch "(index\.html|sw\.js|manifest\.webmanifest)$">
+  # The app shell + HTML files + service worker must always revalidate (overrides the above)
+  <FilesMatch "(\.html|sw\.js|manifest\.webmanifest)$">
     Header set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
 </IfModule>

@@ -46,7 +46,7 @@ export function buildOrderMessage({
   lines.push('')
   if (deliveryMethod === 'pickup') {
     lines.push('*Delivery method*')
-    lines.push('Pick up at station (Speedtouch — Old Bolaji)')
+    lines.push('Pick up at station (Speedtouch — Old Bodija)')
   } else {
     lines.push('*Shipping address*')
     lines.push('Home delivery')

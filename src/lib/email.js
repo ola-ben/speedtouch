@@ -2,7 +2,7 @@ const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_CUSTOMER = import.meta.env.VITE_EMAILJS_TEMPLATE_CUSTOMER
 const EMAILJS_TEMPLATE_ADMIN = import.meta.env.VITE_EMAILJS_TEMPLATE_ADMIN
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'info@speedtouch.com.ng'
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'speedtouch@gmail.com'
 
 /**
  * Formats order items into a clean text block/HTML for the email template.

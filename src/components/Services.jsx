@@ -1,6 +1,9 @@
+'use client'
+
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Star, ChevronDown, ChevronUp, PenSquare } from 'lucide-react'
+import { motion } from 'framer-motion'
 import Reveal from './Reveal'
 import { useServices } from '../hooks/useServices'
 import { useApprovedReviews } from '../hooks/useReviews'
@@ -39,7 +42,6 @@ const bookingLink = (service) => {
   )
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
 }
-
 
 function Services() {
   const navigate = useNavigate()
@@ -167,9 +169,11 @@ function Services() {
                     mobileSkip
                     className="w-4/5 shrink-0 snap-center sm:w-auto sm:shrink"
                   >
-                    <article
+                    <motion.article
+                      whileHover={{ y: -6 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
                       onClick={() => navigate(`/services/${s.id}`)}
-                      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition hover:-translate-y-1"
+                      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition-shadow hover:shadow-lg"
                     >
                       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                         {s.image && (
@@ -234,8 +238,8 @@ function Services() {
                             <button
                               type="button"
                               onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleOpenReviewModal(s.name)
+                                e.stopPropagation()
+                                handleOpenReviewModal(s.name)
                               }}
                               className="inline-flex items-center gap-1 font-semibold text-brand-blue hover:text-brand-blue-deep transition cursor-pointer"
                             >
@@ -314,7 +318,7 @@ function Services() {
                           </span>
                         </div>
                       </div>
-                    </article>
+                    </motion.article>
                   </Reveal>
                 )
               })}
@@ -350,4 +354,3 @@ function Services() {
 }
 
 export default Services
-

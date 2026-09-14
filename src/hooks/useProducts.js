@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { fetchProductById, fetchProducts } from '../lib/products'
 import { isSupabaseConfigured } from '../lib/supabase'

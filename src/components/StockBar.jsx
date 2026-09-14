@@ -1,3 +1,5 @@
+'use client'
+
 function StockBar({ stock }) {
   if (stock == null) return null
   if (stock === 0) {
