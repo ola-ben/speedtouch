@@ -1,26 +1,59 @@
 'use client'
 
+import { useState } from 'react'
 import Reveal from './Reveal'
 
-const HERO_IMAGE = '/hero-cleaning.jpg'
+// Mixkit hosts CC0 videos and permits hotlinking. Swap the ID for any of:
+//   21380 — Woman cleaning her house in detail
+//   43377 — Young woman cleaning happily
+//   23181 — A tired woman cleaning
+//   45039 — Vacuum cleaning a sofa
+// For production, prefer downloading the .mp4 into src/assets/ and importing it.
+const HERO_VIDEO = 'https://assets.mixkit.co/videos/43373/43373-720.mp4'
+const HERO_POSTER =
+  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&q=80&auto=format&fit=crop'
 
 function Hero() {
+  const [videoOk, setVideoOk] = useState(true)
+
   return (
     <section id="top" className="relative isolate overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <img
-          src={HERO_IMAGE}
-          alt="Speedtouch Professional Cleaners in Ibadan"
-          fetchPriority="high"
-          decoding="async"
-          className="h-full w-full object-cover object-center"
-        />
+        {videoOk ? (
+          <video
+            className="h-full w-full object-cover"
+            src={HERO_VIDEO}
+            poster={HERO_POSTER}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            onError={() => setVideoOk(false)}
+            onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
+          />
+        ) : (
+          <img
+            src={HERO_POSTER}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-linear-to-b from-white/40 via-white/70 to-white" />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-5 text-center sm:px-6 md:pb-32 md:pt-5">
         <Reveal>
-          <h1 className="text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand-pink bg-white/80 px-3 py-1 text-xs font-medium text-brand-pink-deep backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-pink-deep" />
+            Trusted by 5,000+ homes
+          </span>
+
+          <h1 className="mt-5 text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 sm:text-6xl md:mt-8 md:text-7xl lg:text-8xl">
             A spotless home,
             <br />
             <em className="text-brand-blue">without the hassle</em>

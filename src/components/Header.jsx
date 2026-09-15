@@ -10,9 +10,9 @@ import { useAuth } from '../context/AuthContext'
 
 const links = [
   { label: 'Home', to: '/' },
-  { label: 'Services', to: '/services' },
+  { label: 'Services', to: '/#services' },
   { label: 'Products', to: '/products' },
-  { label: 'Our Work', to: '/work' },
+  { label: 'Pricing', to: '/#pricing' },
   { label: 'Contact', to: '/#contact' },
 ]
 
@@ -94,12 +94,6 @@ function Header() {
               {l.label}
             </Link>
           ))}
-          <Link
-            to="/account"
-            className="text-sm font-medium text-slate-600 transition hover:text-brand-blue"
-          >
-            {isAuthenticated ? 'My Account' : 'Sign In'}
-          </Link>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
