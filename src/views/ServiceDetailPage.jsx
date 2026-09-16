@@ -58,6 +58,38 @@ const bookingLink = (service) => {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
 }
 
+function getServiceImage(service) {
+  if (service?.image && service.image.startsWith('/services/')) {
+    return service.image
+  }
+  const n = (service?.name || '').toLowerCase()
+  if (n.includes('facade') || n.includes('façade') || n.includes('window')) {
+    return '/services/facade-cleaning.jpg'
+  }
+  if (n.includes('carpet') || n.includes('upholster') || n.includes('sofa') || n.includes('rug')) {
+    return '/services/carpet-cleaning.jpg'
+  }
+  if (n.includes('post-construction') || n.includes('renovat') || n.includes('construction')) {
+    return '/services/post-construction.jpg'
+  }
+  if (n.includes('janitor') || n.includes('office')) {
+    return '/services/janitorial-office.jpg'
+  }
+  if (n.includes('garden') || n.includes('landscap') || n.includes('lawn')) {
+    return '/services/gardening-landscaping.jpg'
+  }
+  if (n.includes('housekeep') || n.includes('guest') || n.includes('staff') || n.includes('standard')) {
+    return '/services/housekeeping.jpg'
+  }
+  if (n.includes('deep')) {
+    return '/services/carpet-cleaning.jpg'
+  }
+  if (n.includes('move')) {
+    return '/services/gardening-landscaping.jpg'
+  }
+  return service?.image || '/services/janitorial-office.jpg'
+}
+
 function ServiceDetailPage() {
   const { id } = useParams()
   const { services, loading: servicesLoading } = useServices()
@@ -126,18 +158,12 @@ function ServiceDetailPage() {
           {/* Left Column: Image */}
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
             <div className="relative aspect-4/3">
-              {service.image ? (
-                <ImageWithLoader
-                  src={service.image}
-                  alt={service.name}
-                  className="h-full w-full"
-                  imgClassName="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-slate-100 text-slate-400">
-                  No Image Available
-                </div>
-              )}
+              <ImageWithLoader
+                src={getServiceImage(service)}
+                alt={service.name}
+                className="h-full w-full"
+                imgClassName="h-full w-full object-cover"
+              />
               {service.popular && (
                 <span className="absolute right-4 top-4 rounded-full bg-brand-pink-deep px-3 py-1.5 text-xs font-semibold text-white shadow-md">
                   Most booked
