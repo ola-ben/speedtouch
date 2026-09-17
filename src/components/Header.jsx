@@ -59,7 +59,7 @@ function Header() {
       whileTap={{ scale: 0.92 }}
       onClick={openDrawer}
       aria-label={`Open cart (${count} ${count === 1 ? 'item' : 'items'})`}
-      className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-brand-blue ${className}`}
+      className={`relative inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 hover:text-brand-blue ${className}`}
     >
       <ShoppingBag className="h-5 w-5" />
       <AnimatePresence>
@@ -81,7 +81,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:py-3.5 sm:px-6">
         <Logo />
 
         <nav className="hidden items-center gap-7 md:flex">
@@ -116,7 +116,7 @@ function Header() {
             aria-expanded={open}
             whileTap={{ scale: 0.9 }}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100"
+            className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100"
           >
             <motion.div
               animate={{ rotate: open ? 90 : 0 }}

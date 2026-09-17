@@ -9,7 +9,7 @@ function Logo({ className = '' }) {
       <img
         src={typeof logo === 'string' ? logo : (logo?.src || '/logo.png')}
         alt="Speedtouch — cleanings and hygiene Ltd"
-        className="h-10 w-auto"
+        className="h-8 sm:h-10 w-auto"
         width="1087"
         height="333"
       />

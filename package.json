@@ -8,6 +8,7 @@
     "build": "next build",
     "lint": "next lint",
     "preview": "vite preview",
+    "build:cpanel": "vite build && powershell -ExecutionPolicy Bypass -File scripts/build-zip.ps1",
     "start": "next start"
   },
   "dependencies": {

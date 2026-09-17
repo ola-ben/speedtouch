@@ -1,65 +1,38 @@
 'use client'
 
-import { useState } from 'react'
 import Reveal from './Reveal'
 
-// Mixkit hosts CC0 videos and permits hotlinking. Swap the ID for any of:
-//   21380 — Woman cleaning her house in detail
-//   43377 — Young woman cleaning happily
-//   23181 — A tired woman cleaning
-//   45039 — Vacuum cleaning a sofa
-// For production, prefer downloading the .mp4 into src/assets/ and importing it.
-const HERO_VIDEO = 'https://assets.mixkit.co/videos/43373/43373-720.mp4'
-const HERO_POSTER =
-  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&q=80&auto=format&fit=crop'
+const HERO_IMAGE = '/hero-nigerian-service.jpg'
 
 function Hero() {
-  const [videoOk, setVideoOk] = useState(true)
-
   return (
-    <section id="top" className="relative isolate overflow-hidden">
+    <section id="top" className="relative isolate overflow-hidden bg-slate-950">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        {videoOk ? (
-          <video
-            className="h-full w-full object-cover"
-            src={HERO_VIDEO}
-            poster={HERO_POSTER}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-            onError={() => setVideoOk(false)}
-            onCanPlay={(e) => e.currentTarget.play().catch(() => {})}
-          />
-        ) : (
-          <img
-            src={HERO_POSTER}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
-        )}
-        <div className="absolute inset-0 bg-linear-to-b from-white/40 via-white/70 to-white" />
+        <img
+          src={HERO_IMAGE}
+          alt="Professional Nigerian Cleaning Service in Ibadan"
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-cover object-center"
+        />
+        {/* Cinematic contrast overlay: preserves true blacks, highlights edge sharpness, and eliminates milky white fog */}
+        <div className="absolute inset-0 bg-linear-to-b from-slate-950/70 via-slate-950/45 to-slate-950" />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-5 text-center sm:px-6 md:pb-32 md:pt-5">
         <Reveal>
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-pink bg-white/80 px-3 py-1 text-xs font-medium text-brand-pink-deep backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-pink-deep" />
-            Trusted by 5,000+ homes
-          </span>
+          {/* Spacer preserving the exact height of the previous badge so nothing shifts */}
+          <div className="h-[26px]" aria-hidden="true" />
 
-          <h1 className="mt-5 text-5xl font-semibold leading-[0.95] tracking-tight text-slate-900 sm:text-6xl md:mt-8 md:text-7xl lg:text-8xl">
+          <h1 className="mt-5 text-5xl font-semibold leading-[0.95] tracking-tight text-white sm:text-6xl md:mt-8 md:text-7xl lg:text-8xl">
             A spotless home,
             <br />
-            <em className="text-brand-blue">without the hassle</em>
+            <em className="font-semibold italic bg-linear-to-r from-blue-400 via-sky-300 to-cyan-300 bg-clip-text text-transparent">
+              without the hassle
+            </em>
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl text-base text-slate-700 md:mt-7 md:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-base font-normal text-slate-200 md:mt-7 md:text-lg">
             Professional cleaners, eco-friendly products, and a satisfaction
             guarantee. Book in 60 seconds — we'll handle the rest.
           </p>
@@ -67,34 +40,23 @@ function Hero() {
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:mt-10 md:gap-x-8 md:gap-y-4">
             <a
               href="#book"
-              className="rounded-full bg-slate-900 px-7 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-brand-blue"
+              className="rounded-full bg-brand-blue px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-600 hover:shadow-blue-500/50"
             >
               Book your first clean
             </a>
             <a
               href="#services"
-              className="text-sm font-medium text-slate-900 underline underline-offset-4 transition hover:text-brand-blue"
+              className="text-sm font-medium text-white/90 underline underline-offset-4 transition hover:text-white"
             >
               See services →
             </a>
           </div>
 
-          <div className="mt-9 flex items-center justify-center gap-3 text-sm text-slate-700 md:mt-14">
-            <div className="flex -space-x-2">
-              {[12, 32, 44, 5].map((id) => (
-                <img
-                  key={id}
-                  src={`https://i.pravatar.cc/80?img=${id}`}
-                  alt=""
-                  loading="lazy"
-                  className="h-8 w-8 rounded-full border-2 border-white object-cover shadow-sm"
-                />
-              ))}
-            </div>
+          <div className="mt-9 flex items-center justify-center gap-3 text-sm text-slate-300 md:mt-14">
             <span>
-              <span className="font-semibold text-slate-900">5,000+ happy clients</span>
+              <span className="font-semibold text-white">5,000+ happy clients</span>
               {' · '}
-              4.9 / 5 ★★★★★
+              <span className="text-amber-400 font-medium">4.9 / 5 ★★★★★</span>
             </span>
           </div>
         </Reveal>

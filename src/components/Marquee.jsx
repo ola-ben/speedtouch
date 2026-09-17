@@ -15,7 +15,7 @@ function Marquee() {
   return (
     <div
       aria-label="Services we offer"
-      className="relative overflow-hidden border-y border-slate-200 bg-slate-900 py-3 md:py-5"
+      className="relative -mt-px overflow-hidden border-b border-slate-800/40 bg-slate-950 py-3 md:py-5"
     >
       <div className="flex w-max animate-marquee">
         {[0, 1].map((copy) => (
